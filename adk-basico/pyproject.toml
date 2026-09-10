@@ -1,0 +1,11 @@
+[project]
+name = "adk-basico"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "bentoml>=1.4.39",
+    "google-adk>=2.8.0",
+    "joblib>=1.6.0",
+    "pandas>=3.0.5",
+    "scikit-learn>=1.9.0",
+]

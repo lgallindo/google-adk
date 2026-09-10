@@ -1,0 +1,18 @@
+# Chaves de API — nunca versionar. Use .env.exemplo como modelo.
+.env
+**/.env
+
+# Ambientes virtuais
+.venv/
+**/.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Estado de sessão do ADK
+.adk/
+**/.adk/
+
+# Material de aula (distribuído fora do repositório)
+CLASSROOM-INSTALAR-ADK.md

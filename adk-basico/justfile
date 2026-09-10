@@ -1,0 +1,52 @@
+# =============================================================================
+# Um agente cuja ferramenta é um modelo servido por HTTP.
+#
+# Esta pasta é autossuficiente: o modelo (servico/modelo.joblib) e o serviço
+# que o expõe (servico/service.py) estão aqui dentro. Nada aqui depende de
+# outra pasta de aula.
+#
+# Precisa de DOIS terminais:
+#     terminal 1:  just servico     sobe o serviço em localhost:3000
+#     terminal 2:  just web         abre o agente em localhost:8000
+# =============================================================================
+
+default:
+    @just --list
+
+# Instala/atualiza a .venv local a partir do pyproject.toml + uv.lock.
+sync:
+    uv sync --no-active
+
+# Sobe o serviço que é a ferramenta do agente (localhost:3000).
+servico:
+    cd servico && uv run --no-active bentoml serve service:Triagem
+
+# Abre a interface web do ADK no navegador (http://localhost:8000).
+web:
+    uv run --no-active adk web
+
+# Conversa com o agente pelo terminal, se você preferir.
+run:
+    uv run --no-active adk run triagem
+
+# Confere que o serviço está de pé e responde (precisa do `just servico`).
+testar-servico:
+    #!/usr/bin/env bash
+    set -o pipefail
+    if ! curl -sf -m 3 -o /dev/null http://localhost:3000/readyz; then
+        echo "ERRO: nada respondendo em http://localhost:3000."
+        echo ""
+        echo "  Abra OUTRO terminal, entre nesta pasta e rode:"
+        echo "      just servico"
+        echo ""
+        echo "  Espere a linha 'Service Triagem initialized' e volte aqui."
+        exit 1
+    fi
+    for decisao in "Acesso Negado" "Acesso Concedido"; do
+        echo -n "$decisao -> "
+        curl -sS --fail-with-body -m 30 \
+            -X POST -H 'Content-Type: application/json' \
+            -d "$(jq -nc --arg d "$decisao" '{Decisao:$d}')" \
+            http://localhost:3000/risco
+        echo ""
+    done
