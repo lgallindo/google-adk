@@ -42,7 +42,15 @@ def _modelo_gemini() -> Gemini:
 
 
 def _modelo_qwen() -> Any:
-    from google.adk.models.lite_llm import LiteLlm
+    try:
+        from google.adk.models.lite_llm import LiteLlm
+    except ImportError as e:
+        raise ImportError(
+            "Qwen local precisa do LiteLLM. Neste repo rode: just sync\n"
+            "(Pacote: google-adk[extensions] / litellm.)\n"
+            "Não use o .venv de outra pasta de aula — o ADK tem que subir "
+            "com: cd google-adk && just web"
+        ) from e
 
     return LiteLlm(
         model=NOME_QWEN_LITELLM,

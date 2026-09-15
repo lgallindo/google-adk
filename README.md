@@ -159,6 +159,11 @@ sudo apt install jq   # se ainda não tiver
 Confira: `uv --version && just --version && jq --version`  
 (`just` ≥ 1.31; evite o `just` velho do `apt`.)
 
+**Não faça `source …/bin/activate`.** As receitas usam `uv run --no-active`
+e montam o `.venv` deste repo sozinhas. Se você ativar o venv de
+`adk-basico/` ou de outra pasta de aula, o `adk` pode importar pacotes do
+lugar errado.
+
 **Dentro deste repositório:**
 
 ```bash
@@ -330,5 +335,6 @@ duas arquiteturas, dois modos de errar. Vale abrir os dois lado a lado.
 | `adk: command not found` | você rodou fora do `uv run`. Use as receitas do `just` |
 | A interface web não abre | ela sobe em <http://localhost:8000>, e o terminal fica ocupado enquanto ela está de pé |
 | `ERRO: Qwen não responde` | `just qwen-serve` noutro terminal; espere carregar; depois `just web` |
+| `LiteLLM support requires: google-adk[extensions]` | o `.venv` estava quebrado (shebang apontava para outra aula) ou você ativou outro venv. Rode `deactivate`, depois `rm -rf .venv && just sync`. **Não** use `source …/activate` |
 | porta 3000 ocupada | `PORT=3001 just qwen-serve` e `QWEN_API_BASE=http://127.0.0.1:3001/v1 just web` |
 | Qwen lento / máquina pesada | normal em CPU com `debate`/`ata` (7 chamadas); use `conversa` ou `just web-gemini` |
