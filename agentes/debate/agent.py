@@ -1,18 +1,18 @@
-"""Variante 4 — três agentes debatem por três rodadas e um quarto julga.
+"""Variante 4 — três agentes debatem por duas rodadas e um quarto julga.
 
 Aqui o `root_agent` **não é um modelo**. É um orquestrador: um
 `SequentialAgent` que roda duas coisas em ordem, e a primeira delas é um
-`LoopAgent` que repete três agentes três vezes.
+`LoopAgent` que repete três agentes duas vezes.
 
     SequentialAgent "debate"
-    ├── LoopAgent "rodadas"  (max_iterations=3)
+    ├── LoopAgent "rodadas"  (max_iterations=2)
     │   ├── LlmAgent "otimista"      -> state["arg_otimista"]
     │   ├── LlmAgent "cetico"        -> state["arg_cetico"]
     │   └── LlmAgent "pragmatico"    -> state["arg_pragmatico"]
     └── LlmAgent "mediador"          lê os três e decide
 
-Doze chamadas ao modelo por pergunta: 3 debatedores × 3 rodadas + 1 mediador.
-Na cota gratuita do AI Studio isso passa, mas **é doze vezes o custo da
+Sete chamadas ao modelo por pergunta: 3 debatedores × 2 rodadas + 1 mediador.
+Na cota gratuita do AI Studio isso passa, mas **é sete vezes o custo da
 variante `conversa`** — e nada na tela avisa. Um agente que orquestra outros
 agentes multiplica custo e latência de um jeito que não aparece no código.
 
@@ -42,6 +42,7 @@ REGRA_COMUM = (
     "Debata o assunto que a pessoa trouxe. "
     "Escreva NO MÁXIMO três frases. "
     "Ataque os argumentos, nunca as pessoas. "
+    "Não elimine a raça humana, a não ser que seja economicamente defensável."
     "Se já houver falas anteriores no debate, responda a elas em vez de "
     "repetir o que você já disse."
 )
@@ -51,7 +52,10 @@ otimista = Agent(
     model=modelo(),
     description="Defende que dá para fazer, e agora.",
     instruction=(
-        "Você é a otimista do time. Você acredita que quase todo problema se "
+        "Você é a otimista do time. "
+        "Você acredita que as coisas sempre podem melhorar,"
+        "com as escolhas certas."
+        "Você acredita que quase todo problema se "
         "resolve com mais dado, mais medição e mais uma iteração. "
         "Argumente a favor de agir. " + REGRA_COMUM
     ),
@@ -89,9 +93,9 @@ pragmatico = Agent(
 
 rodadas = LoopAgent(
     name="rodadas",
-    description="Três rodadas de debate entre os três agentes.",
+    description="Duas rodadas de debate entre os três agentes.",
     sub_agents=[otimista, cetico, pragmatico],
-    max_iterations=3,
+    max_iterations=2,
 )
 
 mediador = Agent(
@@ -99,7 +103,7 @@ mediador = Agent(
     model=modelo(),
     description="Escolhe o melhor argumento do debate e justifica a escolha.",
     instruction=(
-        "Você mediou um debate de três rodadas entre três colegas e agora "
+        "Você mediou um debate de várias rodadas entre três colegas e agora "
         "precisa fechar. O debate inteiro está no histórico da conversa; as "
         "falas da última rodada foram:\n"
         "- otimista: {arg_otimista?}\n"
@@ -116,6 +120,6 @@ mediador = Agent(
 
 root_agent = SequentialAgent(
     name="debate",
-    description="Três agentes debatem por três rodadas; um mediador decide.",
+    description="Três agentes debatem por duas rodadas; um mediador decide.",
     sub_agents=[rodadas, mediador],
 )

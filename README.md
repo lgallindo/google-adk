@@ -4,20 +4,23 @@ Este repositório existe para **experimentar com o Agent Development Kit (ADK)
 do Google** — a biblioteca que a gente usa para montar agentes: modelos de
 linguagem que decidem sozinhos quando chamar uma função sua.
 
-São cinco variantes. Cada uma é um agente inteiro, e a diferença entre uma e a
-seguinte é **uma ideia só**. Leia na ordem; cada `agent.py` explica no cabeçalho
-o que mudou em relação ao anterior.
+São cinco variantes e uma emenda. Cada variante é um agente inteiro, e a
+diferença entre uma e a seguinte é **uma ideia só**. Leia na ordem; cada
+`agent.py` explica no cabeçalho o que mudou em relação ao anterior. A `4b` é a
+exceção: ela não traz ideia nova de agente, ela conserta os defeitos de estado
+que a `4` deixa à mostra.
 
 | # | Pasta | A ideia nova | Chamadas ao modelo |
 | --- | --- | --- | --- |
 | 1 | [`agentes/conversa`](agentes/conversa/agent.py) | Um agente é um modelo com uma instrução. Nada mais. | 1 |
 | 2 | [`agentes/ferramenta`](agentes/ferramenta/agent.py) | Ferramenta é uma função Python — nove delas. A docstring vira a especificação. | 1 |
 | 3 | [`agentes/externa`](agentes/externa/agent.py) | A ferramenta sai da máquina e chama uma API de verdade. | 1 |
-| 4 | [`agentes/debate`](agentes/debate/agent.py) | Três agentes debatem 3 rodadas; um quarto julga. | **12** |
+| 4 | [`agentes/debate`](agentes/debate/agent.py) | Três agentes debatem 2 rodadas; um quarto julga. | **7** |
+| 4b | [`agentes/ata`](agentes/ata/agent.py) | O mesmo debate, com as rodadas guardadas em ata em vez de sobrescritas. | **7** |
 | 5 | [`adk-basico/`](adk-basico/README.md) | A ferramenta é um modelo de AM servido por HTTP, na própria pasta. | 1 |
 
 A variante 5 mora em pasta separada, com ambiente próprio, porque precisa de
-dois terminais e de bibliotecas que as outras quatro não usam. Ela é
+dois terminais e de bibliotecas que as outras cinco não usam. Ela é
 autossuficiente: o modelo e o serviço que o expõe estão dentro dela.
 
 ---
@@ -37,9 +40,9 @@ licença Apache 2.0, para escrever agentes. Ele cuida da parte chata e repetida:
 - dar uma **interface web de teste** (`adk web`) e um modo terminal
   (`adk run`), que é como a gente roda tudo aqui.
 
-O que o ADK **não** é: ele não é o modelo. O modelo (aqui, o Gemini) mora num
-servidor do Google e é cobrado por chamada. O ADK é só o código que fala com
-ele do seu lado.
+O que o ADK **não** é: ele não é o modelo. Por padrão este repo usa **Qwen3
+local** (`servico-qwen/`). Opcionalmente usa **Gemini** na nuvem
+(`ADK_BACKEND=gemini` + chave). O ADK é só o código que fala com o modelo.
 
 ### Uma linha do tempo bem curta
 
@@ -98,8 +101,8 @@ comando. É daí que vem o `--no-active` que você vai ver espalhado pelos
 justfiles: ele manda o `uv` ignorar qualquer ambiente que você por acaso tenha
 ativado na mão e usar sempre o `.venv/` deste projeto.
 
-São **dois** ambientes aqui, e de propósito: um na raiz, para as quatro
-primeiras variantes, e outro dentro de `adk-basico/`, que precisa também do
+São **dois** ambientes aqui, e de propósito: um na raiz, para as cinco
+pastas de `agentes/`, e outro dentro de `adk-basico/`, que precisa também do
 BentoML e do scikit-learn. Cada um tem o seu `pyproject.toml` e o seu
 `uv.lock`, e cada um pede o seu `just sync`.
 
@@ -119,97 +122,87 @@ ver as receitas disponíveis.
 
 ---
 
-## O que é uma chave de API, e como conseguir uma
+## O que é uma chave de API (só se for usar Gemini)
 
-O modelo não roda na sua máquina. Quando o agente "pensa", o que acontece de
-verdade é uma requisição HTTP para um servidor do Google, que roda o Gemini e
-devolve a resposta. A **chave de API** é o texto que vai junto nessa
-requisição para dizer *quem* está pedindo: é ao mesmo tempo a sua identidade,
-a sua permissão de uso e o endereço da conta que leva a cota — ou a fatura.
+O caminho **padrão** deste repo é Qwen3 local — **não precisa de chave**.
 
-Duas consequências, e as duas valem para qualquer API paga, não só esta:
+Gemini é opcional (`just web-gemini`). Aí sim: quando o agente "pensa", o ADK
+faz HTTP para o Google. A **chave de API** identifica a sua conta e a cota.
 
-1. **Chave é senha.** Quem tem a sua chave gasta no seu nome. Não cole em
-   slide, não mande no WhatsApp da turma, não commite. É por isso que aqui ela
-   mora em arquivos `.env`, que não vão para o git — o que está commitado é o
-   `.env.exemplo`, com o texto `cole-sua-chave-aqui` no lugar.
-2. **Sem chave, nada roda.** Se você ver um erro falando em
-   `GOOGLE_API_KEY`, `401` ou `PERMISSION_DENIED`, quase sempre é a chave
-   faltando, com espaço sobrando, ou não copiada para a pasta da variante.
+1. **Chave é senha.** Não cole em slide, WhatsApp da turma, nem no git. Mora
+   em `.env` (gitignored); no git só existe `.env.exemplo`.
+2. **Sem chave válida, só o caminho Gemini quebra** — o Qwen local continua
+   normal.
 
-### Pegando a sua (é de graça)
+### Pegando uma chave (opcional)
 
-1. Entre em <https://aistudio.google.com/apikey> com uma conta Google.
-2. Clique em **Create API key** / *Criar chave de API*. Se ele pedir para
-   escolher ou criar um projeto do Google Cloud, pode aceitar o que ele
-   sugerir.
-3. Copie o texto que aparece (começa com `AIza...`). Ele só é mostrado
-   inteiro nessa hora — se perder, gere outra e apague a antiga.
-4. Cole no `.env`, como está na seção de instalação abaixo.
+1. <https://aistudio.google.com/apikey> com Gmail **pessoal** (conta de
+   faculdade/Workspace costuma bloquear).
+2. Aceite os termos; **Create API key**.
+3. **Key Type** = Authorization / auth key (não Standard).
+4. Cole no `.env` e rode `just chave`.
 
-O AI Studio tem uma **cota gratuita**, que é o que a turma usa. Ela é
-suficiente para a aula, mas é limitada por minuto e por dia, e quando aperta o
-servidor responde `429` ou `503` em vez da resposta. Isso não é bug seu — é
-justamente o assunto da seção "Por que a variante 4 é cara", mais abaixo, e o
-motivo de existir o [`agentes/modelo.py`](agentes/modelo.py).
-
-Se quiser desligar a chave depois da aula, é na mesma página do AI Studio:
-apagar a chave corta o acesso na hora.
+Cota gratuita responde `429`/`503` quando aperta — ver "Por que a variante 4
+é cara" e [`agentes/modelo.py`](agentes/modelo.py).
 
 ---
 
 ## Instalação
 
-Primeiro as três ferramentas. Elas se instalam uma vez só na sua máquina, não
-uma vez por projeto — se você já tiver alguma, pule.
-
 ```bash
-# 1. uv: instala o Python e as bibliotecas do projeto
+# uma vez na máquina
 curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# 2. just: o executor de receitas explicado acima
 uv tool install rust-just
-
-# 3. jq: formata o JSON que a API devolve, para dar para ler
-sudo apt install jq
+sudo apt install jq   # se ainda não tiver
 ```
 
-Não é engano: o pacote se chama `rust-just`, mas o comando que ele instala se
-chama `just`. Feche e reabra o terminal, e confira as três de uma vez:
+Confira: `uv --version && just --version && jq --version`  
+(`just` ≥ 1.31; evite o `just` velho do `apt`.)
+
+**Dentro deste repositório:**
 
 ```bash
-uv --version && just --version && jq --version
+just sync                 # .venv do ADK
+just sync-qwen            # .venv do servico-qwen (torch CPU + BentoML)
 ```
 
-O `just` precisa ser 1.31 ou mais novo. Evite instalar por `apt`: em várias
-distribuições a versão de lá é velha demais para os módulos que este projeto
-usa.
+A variante 5 (`adk-basico/`) tem ambiente próprio — veja o README dela.
 
-Agora sim, **dentro da pasta do projeto**:
+## Rodar (Qwen local — padrão)
+
+Dois terminais:
 
 ```bash
-just sync                 # monta a .venv com o ADK 2.8.0 (uma vez)
-cp .env.exemplo .env      # cole a chave de https://aistudio.google.com/apikey
-just chave                # copia a chave para as quatro variantes
+just qwen-serve           # terminal 1 — modelo (porta 3000)
+just web                  # terminal 2 — http://localhost:8000
 ```
 
-A variante 5 tem ambiente próprio e se instala à parte — veja
-[`adk-basico/README.md`](adk-basico/README.md).
+Comece pela variante **conversa**. No terminal: `just cli conversa`.
 
-## Rodar
+Se a porta 3000 estiver ocupada:
 
 ```bash
-just web                  # interface no navegador, as quatro numa lista
-just cli debate           # ou pelo terminal, uma de cada vez
+PORT=3001 just qwen-serve
+QWEN_API_BASE=http://127.0.0.1:3001/v1 just web
 ```
 
-Antes de gastar chamada:
+Smoke do modelo sem abrir o ADK: `just verificar-qwen`.
+
+## Rodar com Gemini (opcional)
 
 ```bash
-just verificar            # as quatro carregam? (não fala com o modelo)
-just testar-api           # a BrasilAPI responde? (não fala com o modelo)
+cp .env.exemplo .env      # cole a auth key do AI Studio
+just chave
+just web-gemini
+# ou: just cli-gemini conversa
 ```
 
+Antes de gastar cota na nuvem:
+
+```bash
+just verificar
+just testar-api
+```
 ## Por que a variante 2 existe
 
 Isto foi medido em **09/09/2026**, com a mesma pergunta, no mesmo dia, com o
@@ -233,13 +226,13 @@ coisas diferentes, e nenhum painel de servidor distingue as duas.
 
 ## Por que a variante 4 é cara
 
-Doze chamadas por pergunta: 3 debatedores × 3 rodadas + 1 mediador. Isso é
-**doze vezes** o custo e a latência da variante 1, e nada na tela avisa.
+Sete chamadas por pergunta: 3 debatedores × 2 rodadas + 1 mediador. Isso é
+**sete vezes** o custo e a latência da variante 1, e nada na tela avisa.
 
 E não é só custo. Medido no mesmo dia, seis chamadas seguidas a
 `gemini-3.1-flash-lite` na cota gratuita deram **3 sucessos e 3 erros 503**. Com
-50% de falha por chamada, a chance de as doze passarem é 0,5¹² — uma em quatro
-mil. **O debate falhou três vezes seguidas** antes de existir o
+50% de falha por chamada, a chance de as sete passarem é 0,5⁷ — cerca de uma em
+128. **O debate falhou** na prática antes de existir o
 [`agentes/modelo.py`](agentes/modelo.py), que liga repetição automática em
 429/500/502/503/504 com espera que dobra a cada tentativa.
 
@@ -247,6 +240,59 @@ A conta vale além do Gemini: **num sistema de N passos em série, a
 confiabilidade de cada passo entra elevada a N.** Encadear agentes multiplica a
 fragilidade tão rápido quanto multiplica o custo. Repetição compra resiliência
 contra falha transitória — não contra indisponibilidade.
+
+## O que a variante 4b conserta
+
+A `debate` funciona, e é justamente por funcionar que ela ensina: os três
+defeitos dela são de **estado**, e nenhum deles aparece na resposta.
+
+O mecanismo é o `output_key`. Cada debatedor grava a própria fala numa chave da
+sessão (`arg_otimista`, `arg_cetico`, `arg_pragmatico`) e os outros leem aquela
+chave interpolando `{arg_otimista}` na instrução. Funciona como variável
+compartilhada — e tem os problemas de uma variável compartilhada:
+
+1. **O laço sobrescreve.** `output_key` atribui, não acrescenta. Na rodada 2 o
+   otimista regrava a própria chave e a fala da rodada 1 sai do estado. Ao
+   final das duas rodadas, o estado tem três falas — as últimas. As outras três
+   existiram e não estão em lugar nenhum que você possa abrir.
+2. **O mediador julga o que não leu.** Pelas chaves ele recebe só a rodada 2.
+   A primeira chega a ele pelo histórico da conversa, que é uma coisa
+   que ele vê mas que você não monta, não inspeciona e não controla.
+3. **A leitura é assimétrica.** O otimista não tem nenhum `{...}` na
+   instrução, o cético tem um, o pragmático tem dois. Os três debatem olhando
+   para estados diferentes, e isso não está escrito em lugar nenhum — está
+   implícito na ordem da lista de `sub_agents`.
+
+A `ata` resolve os três com duas peças do ADK que a `debate` não usa:
+
+- **`after_agent_callback`** — roda depois de cada debatedor, na janela em que
+  a fala já está na chave e a próxima rodada ainda não a sobrescreveu. Ele
+  copia a fala para o fim de uma lista em `state["ata"]`. Seis falas ao final,
+  com rodada e autor. O `output_key` deixa de ser a memória do debate e passa a
+  ser só a caixa de entrada do callback.
+- **instrução que é função** — `instruction=` aceita uma string ou um callable
+  que recebe o contexto e devolve o texto. Uma lista não cabe na forma string
+  (`{ata}` renderizaria o `repr` do Python no prompt), então a transcrição é
+  montada com um `for`. Os três debatedores usam a **mesma** função, e a
+  assimetria desaparece.
+
+Duas armadilhas que valem a aula, as duas anotadas no código:
+
+- `state["ata"] = nova_lista` registra a mudança; `state["ata"].append(...)`
+  **não**. Com sessão em memória os dois parecem funcionar, porque é o mesmo
+  objeto. O segundo só quebra no dia em que você liga o banco.
+- O contador de rodada mora num `before_agent_callback` do otimista **porque
+  ele é o primeiro da lista**. Troque a ordem dos `sub_agents` e o contador
+  precisa mudar de agente junto.
+
+O custo não muda: continuam sete chamadas. O que aumenta é o **número de
+tokens** — a ata viaja no prompt de todo mundo e o histórico da conversa
+continua viajando também.
+
+E um defeito que a `4b` não conserta, porque não é dela: o estado morre com o
+processo. Quem escolhe onde guardar sessão não é o `agent.py`, é quem sobe o
+servidor. `just web` usa memória; `just web-memoria` sobe o mesmo servidor com
+um SQLite ao lado, e aí a ata sobrevive a um Ctrl+C.
 
 ## O que dá para mexer em aula
 
@@ -258,8 +304,12 @@ contra falha transitória — não contra indisponibilidade.
   na tela pede confirmação.
 - **`externa`** — desligue o wi-fi e veja a ferramenta devolver `{"erro": ...}`
   em vez de derrubar o turno.
-- **`debate`** — mude `max_iterations` de 3 para 1 e compare custo e qualidade.
+- **`debate`** — mude `max_iterations` de 2 para 1 e compare custo e qualidade.
   Ou acrescente um quarto debatedor e veja quantas chamadas isso vira.
+- **`ata`** — rode a mesma pergunta nas duas e abra a aba **State** do
+  `adk web` lado a lado: a `debate` termina com três falas guardadas, a `ata`
+  com seis. Depois comente o `after_agent_callback=registrar` de um dos três e
+  veja a ata ficar com furo — sem nenhum erro na tela.
 
 ## Onde isto encosta no resto do curso
 
@@ -274,8 +324,11 @@ duas arquiteturas, dois modos de errar. Vale abrir os dois lado a lado.
 |---|---|
 | `ERRO: não existe .env aqui` | rode `cp .env.exemplo .env`, cole a chave, e `just chave` de novo |
 | `ERRO: o .env ainda tem o texto de exemplo` | você copiou o arquivo mas não colou a chave dentro dele |
-| `401`, `PERMISSION_DENIED`, `API key not valid` | chave errada, com espaço sobrando, ou não copiada para a pasta da variante — rode `just chave` |
+| `401`, `PERMISSION_DENIED`, `API key not valid` | chave errada, com espaço sobrando, não copiada (`just chave`), chave **Standard** (crie uma **auth key** nova no AI Studio), ou conta institucional sem permissão de criar chave — use Gmail pessoal |
 | `429 RESOURCE_EXHAUSTED` | você bateu na cota gratuita. Espere um minuto |
 | `503 ... high demand` | o servidor recusou. O `modelo.py` já repete sozinho; se insistir, espere |
 | `adk: command not found` | você rodou fora do `uv run`. Use as receitas do `just` |
 | A interface web não abre | ela sobe em <http://localhost:8000>, e o terminal fica ocupado enquanto ela está de pé |
+| `ERRO: Qwen não responde` | `just qwen-serve` noutro terminal; espere carregar; depois `just web` |
+| porta 3000 ocupada | `PORT=3001 just qwen-serve` e `QWEN_API_BASE=http://127.0.0.1:3001/v1 just web` |
+| Qwen lento / máquina pesada | normal em CPU com `debate`/`ata` (7 chamadas); use `conversa` ou `just web-gemini` |

@@ -93,6 +93,9 @@ def sortear(opcoes: list[str], quantas: int = 1) -> dict:
     Args:
         opcoes: a lista de onde sortear, por exemplo ["Ana", "Bruno", "Caio"].
         quantas: quantas opções sortear. O padrão é 1.
+
+    Returns:
+        Um dicionário com a lista de sorteadas e a quantidade total de opções.
     """
     if not opcoes:
         return {"erro": "a lista está vazia"}

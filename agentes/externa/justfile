@@ -1,0 +1,85 @@
+# =============================================================================
+# Variante 3 — externa
+#
+# Ferramentas que chamam a BrasilAPI (HTTP de verdade).
+# Ambiente Python: a .venv da raiz do repositório (compartilhada).
+#
+#     just sync         instala/atualiza a .venv da raiz
+#     just chave        copia a chave da raiz para esta pasta
+#     just testar-api   a BrasilAPI responde? (sem gastar o modelo)
+#     just web          abre a interface só com este agente
+#     just cli          conversa por terminal
+# =============================================================================
+
+default:
+    @just --list
+
+# Instala/atualiza a .venv da raiz.
+sync:
+    cd ../.. && uv sync --no-active
+
+# Copia a chave do AI Studio da raiz para cá.
+chave:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ ! -f ../../.env ]; then
+        echo "ERRO: não existe .env na raiz do repositório."
+        echo ""
+        echo "  1. cd ../.."
+        echo "  2. cp .env.exemplo .env"
+        echo "  3. cole a chave de https://aistudio.google.com/apikey"
+        echo "  4. just chave   (na raiz)  ou  just chave  (aqui)"
+        exit 1
+    fi
+    if grep -q "cole-sua-chave-aqui" ../../.env; then
+        echo "ERRO: o .env da raiz ainda tem o texto de exemplo no lugar da chave."
+        exit 1
+    fi
+    cp ../../.env .env
+    echo "  chave copiada para agentes/externa/"
+
+# Interface web só com este agente (http://localhost:8000).
+web:
+    @echo "Abra http://localhost:8000"
+    uv run --no-active adk web .
+
+# Conversa por terminal.
+cli:
+    uv run --no-active adk run .
+
+# Confere que este agente carrega, sem gastar chamada ao modelo.
+verificar:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    uv run --no-active python - <<'PY'
+    import importlib
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path("..").resolve()))
+    agente = importlib.import_module("externa.agent").root_agent
+    ferramentas = getattr(agente, "tools", None) or []
+    nomes = [getattr(f, "__name__", str(f)) for f in ferramentas]
+    print(f"  ok  externa  {type(agente).__name__} {agente.name!r} — {len(ferramentas)} ferramentas: {', '.join(nomes)}")
+    print("\nCarregou. Nenhuma chamada ao modelo foi feita.")
+    PY
+
+# Testa a BrasilAPI de verdade (sem chamar o modelo).
+testar-api:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    uv run --no-active python - <<'PY'
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path("..").resolve()))
+    from externa.agent import consultar_cep, feriados_do_ano, proximo_feriado
+
+    print("BrasilAPI (chamadas de verdade, sem modelo):")
+    prox = proximo_feriado()
+    print(f"  proximo_feriado -> {prox}")
+    ano = feriados_do_ano(2026)
+    print(f"  feriados_do_ano -> ano {ano.get('ano')}, {ano.get('quantidade')} feriados")
+    cep = consultar_cep("50030-230")
+    print(f"  consultar_cep   -> {cep.get('street', cep)}, {cep.get('city', '')}")
+    PY

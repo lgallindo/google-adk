@@ -13,6 +13,7 @@ __pycache__/
 # Estado de sessão do ADK
 .adk/
 **/.adk/
+sessoes.db
 
 # Material de aula (distribuído fora do repositório)
 CLASSROOM-INSTALAR-ADK.md

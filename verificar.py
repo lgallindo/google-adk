@@ -1,10 +1,10 @@
-"""Confere que as quatro variantes carregam, sem gastar chamada ao modelo.
+"""Confere que as cinco variantes de agentes/ carregam, sem gastar chamada.
 
 Importar o módulo do agente já valida o que mais quebra na prática: nome de
 classe errado, `output_key` em agente que não é LlmAgent, sub-agente faltando,
 docstring de ferramenta mal formada. Nada aqui fala com a API do Gemini.
 
-    just verificar          só carrega os quatro
+    just verificar          só carrega as cinco
     just verificar --api    carrega e ainda testa a BrasilAPI de verdade
 """
 
@@ -18,7 +18,7 @@ from pathlib import Path
 # script quebre exatamente quando o `adk` quebraria.
 sys.path.insert(0, str(Path(__file__).parent / "agentes"))
 
-VARIANTES = ("conversa", "ferramenta", "externa", "debate")
+VARIANTES = ("conversa", "ferramenta", "externa", "debate", "ata")
 
 
 def carregar(nome: str) -> None:

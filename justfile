@@ -1,70 +1,98 @@
 # =============================================================================
-# Agentes do 02173 — quatro variantes, uma rampa
+# Agentes do 02173 — cinco variantes, uma rampa
 #
-# Todas as variantes moram em agentes/ e usam o MESMO ambiente Python (o .venv
-# da raiz), então basta um `just sync` para as quatro.
+# Padrão: Qwen3 local em servico-qwen/ (sem chave Google).
 #
-#     agentes/conversa/     1. só conversa. Nenhuma ferramenta.
-#     agentes/ferramenta/   2. ferramenta é uma função Python local.
-#     agentes/externa/      3. a ferramenta chama a BrasilAPI.
-#     agentes/debate/       4. três agentes debatem 3 rodadas + um mediador.
+#     just sync              .venv do ADK (uma vez)
+#     just sync-qwen         .venv do serviço Qwen (uma vez)
+#     just qwen-serve        terminal 1 — modelo na porta 3000
+#     just web               terminal 2 — ADK em http://localhost:8000
 #
-# A quinta está em adk-basico/, com ambiente próprio, porque precisa de dois
-# terminais e de bibliotecas que as outras quatro não usam. Ela é
-# autossuficiente — o modelo e o serviço estão dentro dela:
-#
-#     adk-basico/           5. a ferramenta é um modelo de AM servido em HTTP.
-#
-# Como rodar:
-#
-#     just sync             instala o ambiente (uma vez)
-#     just chave            copia a sua chave para as quatro variantes
-#     just web              abre a interface e mostra as quatro numa lista
-#     just cli conversa     conversa por terminal, sem navegador
+# Gemini (opcional): ADK_BACKEND=gemini + just chave + just web-gemini
 # =============================================================================
+
+PORT := env_var_or_default("PORT", "3000")
+QWEN_API_BASE := env_var_or_default("QWEN_API_BASE", "http://127.0.0.1:" + PORT + "/v1")
 
 default:
     @just --list
 
-# Instala/atualiza a .venv a partir do pyproject.toml + uv.lock.
 sync:
     uv sync --no-active
 
-# Copia a chave do AI Studio para as quatro variantes.
-# Antes de rodar: cp .env.exemplo .env e cole a sua chave no .env.
+sync-qwen:
+    cd servico-qwen && uv sync --no-active --extra-index-url https://download.pytorch.org/whl/cpu
+
+# Terminal 1 — sobe o Qwen. Deixe aberto.
+qwen-serve:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if ss -ltn "sport = :{{PORT}}" | grep -q LISTEN; then
+        echo "ERRO: porta {{PORT}} ocupada. Liberte-a ou: PORT=3001 just qwen-serve"
+        echo "       (e no outro terminal: QWEN_API_BASE=http://127.0.0.1:3001/v1 just web)"
+        exit 1
+    fi
+    echo "Qwen3 em http://127.0.0.1:{{PORT}} — depois: just web"
+    cd servico-qwen && PORT="{{PORT}}" uv run --no-active bentoml serve service:QwenService --port "{{PORT}}"
+
+_qwen-vivo:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if curl -sf -m 3 -o /dev/null "{{QWEN_API_BASE}}/models"; then exit 0; fi
+    echo "ERRO: Qwen não responde em {{QWEN_API_BASE}}"
+    echo "  Terminal 1: just qwen-serve"
+    echo "  Terminal 2: just web"
+    exit 1
+
+# Terminal 2 — ADK (Qwen por padrão).
+web: _qwen-vivo
+    @echo "Backend: Qwen3 local. Abra http://localhost:8000"
+    ADK_BACKEND=qwen3 QWEN_API_BASE="{{QWEN_API_BASE}}" uv run --no-active adk web agentes
+
+web-memoria: _qwen-vivo
+    @echo "Backend: Qwen3 local + SQLite. Abra http://localhost:8000"
+    ADK_BACKEND=qwen3 QWEN_API_BASE="{{QWEN_API_BASE}}" uv run --no-active adk web agentes --session_service_uri sqlite:///sessoes.db
+
+cli variante: _qwen-vivo
+    ADK_BACKEND=qwen3 QWEN_API_BASE="{{QWEN_API_BASE}}" uv run --no-active adk run agentes/{{variante}}
+
+verificar-qwen: _qwen-vivo
+    #!/usr/bin/env bash
+    set -euo pipefail
+    curl -sS -m 10 "{{QWEN_API_BASE}}/models" | jq .
+    curl -sS -m 180 -X POST "{{QWEN_API_BASE}}/chat/completions" \
+        -H 'Content-Type: application/json' \
+        -d '{"model":"Qwen/Qwen3-0.6B","messages":[{"role":"user","content":"Say hi in one short sentence."}],"max_tokens":32,"temperature":0}' \
+        | jq .
+
+# --- Gemini (opcional) -------------------------------------------------------
+
 chave:
     #!/usr/bin/env bash
     set -euo pipefail
     if [ ! -f .env ]; then
-        echo "ERRO: não existe .env aqui."
-        echo ""
-        echo "  1. cp .env.exemplo .env"
-        echo "  2. abra .env e cole a chave de https://aistudio.google.com/apikey"
-        echo "  3. rode 'just chave' de novo"
+        echo "ERRO: cp .env.exemplo .env e cole a chave do AI Studio"
         exit 1
     fi
     if grep -q "cole-sua-chave-aqui" .env; then
-        echo "ERRO: o .env ainda tem o texto de exemplo no lugar da chave."
+        echo "ERRO: ainda está cole-sua-chave-aqui no .env"
         exit 1
     fi
-    for v in conversa ferramenta externa debate; do
+    for v in conversa ferramenta externa debate ata; do
         cp .env "agentes/$v/.env"
-        echo "  chave copiada para agentes/$v/"
+        echo "  chave → agentes/$v/"
     done
 
-# Abre a interface web do ADK. As quatro variantes aparecem numa lista.
-web:
-    @echo "Abra http://localhost:8000 e escolha a variante na lista."
-    uv run --no-active adk web agentes
+web-gemini:
+    @echo "Backend: Gemini. Precisa de just chave."
+    @echo "Abra http://localhost:8000"
+    ADK_BACKEND=gemini uv run --no-active adk web agentes
 
-# Conversa com UMA variante pelo terminal. Ex.: just cli debate
-cli variante:
-    uv run --no-active adk run agentes/{{variante}}
+cli-gemini variante:
+    ADK_BACKEND=gemini uv run --no-active adk run agentes/{{variante}}
 
-# Confere que as quatro variantes carregam sem erro, sem gastar chamada.
 verificar *args:
     uv run --no-active python verificar.py {{args}}
 
-# O mesmo, e ainda testa a BrasilAPI de verdade (sem chamar o modelo).
 testar-api:
     uv run --no-active python verificar.py --api

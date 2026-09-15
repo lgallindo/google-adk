@@ -1,50 +1,35 @@
-"""O modelo que as quatro variantes usam — com repetição automática.
+"""O modelo que as variantes usam.
 
-POR QUE ISTO EXISTE, EM VEZ DE `model="gemini-3.1-flash-lite"`
----------------------------------------------------------------
-A forma curta funciona e é a que aparece em todo tutorial:
+Padrão: **Qwen3 local** (`servico-qwen/`, OpenAI-compatible em
+`http://127.0.0.1:3000/v1`). Suba com `just qwen-serve` antes de `just web`.
 
-    Agent(model="gemini-3.1-flash-lite", ...)
+Opcional: `ADK_BACKEND=gemini` + `GOOGLE_API_KEY` para a nuvem.
 
-Ela também não repete a chamada quando o servidor recusa. E a cota gratuita do
-AI Studio recusa com frequência: medido em 2026-09-09, seis chamadas seguidas a
-`gemini-3.1-flash-lite` devolveram **3 sucessos e 3 erros 503**
-("This model is currently experiencing high demand").
-
-Para a variante `conversa`, 50% de falha é um Ctrl+C e outra tentativa. Para a
-variante `debate`, que faz **doze** chamadas em sequência, é fatal: a chance de
-as doze passarem é 0,5¹², ou seja, uma em quatro mil. Foi exatamente isso que
-aconteceu — o debate falhou três vezes seguidas antes deste arquivo existir.
-
-A conta é a lição, e ela não é sobre o Gemini: **num sistema de N passos em
-série, a confiabilidade de cada passo entra elevada a N.** Encadear agentes
-multiplica a fragilidade tão rápido quanto multiplica o custo.
-
-`HttpRetryOptions` resolve a parte mecânica: repete em 429/500/502/503/504,
-com espera que dobra a cada tentativa (1 s, 2 s, 4 s...) e um pouco de
-aleatoriedade para trinta máquinas da turma não repetirem todas no mesmo
-instante.
-
-O que ela NÃO resolve: se o serviço estiver fora do ar de verdade, seis
-tentativas só deixam o aluno esperando mais. Repetição compra resiliência
-contra falha transitória, não contra indisponibilidade.
+    ADK_BACKEND=qwen3|gemini     padrão: qwen3
+    QWEN_API_BASE=http://127.0.0.1:3000/v1
+    QWEN_MODEL=openai/Qwen/Qwen3-0.6B
 """
+
+from __future__ import annotations
+
+import os
+from typing import Any
 
 from google.adk.models import Gemini
 from google.genai import types
 
-NOME = "gemini-3.1-flash-lite"
+NOME_GEMINI = "gemini-3.1-flash-lite"
+NOME_QWEN_LITELLM = os.environ.get("QWEN_MODEL", "openai/Qwen/Qwen3-0.6B")
+QWEN_API_BASE = os.environ.get("QWEN_API_BASE", "http://127.0.0.1:3000/v1")
 
 
-def modelo() -> Gemini:
-    """Devolve o modelo configurado para repetir falhas transitórias.
+def _backend() -> str:
+    return os.environ.get("ADK_BACKEND", "qwen3").strip().lower()
 
-    É uma função, e não uma constante, porque cada agente recebe a sua própria
-    instância — quatro agentes compartilhando um objeto de modelo é o tipo de
-    acoplamento que só dá problema depois.
-    """
+
+def _modelo_gemini() -> Gemini:
     return Gemini(
-        model=NOME,
+        model=NOME_GEMINI,
         retry_options=types.HttpRetryOptions(
             attempts=6,
             initial_delay=1.0,
@@ -54,3 +39,21 @@ def modelo() -> Gemini:
             http_status_codes=[429, 500, 502, 503, 504],
         ),
     )
+
+
+def _modelo_qwen() -> Any:
+    from google.adk.models.lite_llm import LiteLlm
+
+    return LiteLlm(
+        model=NOME_QWEN_LITELLM,
+        api_base=QWEN_API_BASE,
+        api_key=os.environ.get("QWEN_API_KEY", "local"),
+        drop_params=True,
+    )
+
+
+def modelo() -> Any:
+    """Qwen3 local por padrão; Gemini se `ADK_BACKEND=gemini`."""
+    if _backend() in ("gemini", "google", "cloud"):
+        return _modelo_gemini()
+    return _modelo_qwen()
