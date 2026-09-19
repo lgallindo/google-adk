@@ -1,0 +1,67 @@
+# =============================================================================
+# Variante 4d — frase
+#
+# ParallelAgent no osso: cole uma frase, três agentes a reescrevem ao mesmo
+# tempo, um relator compara (4 chamadas ao modelo por frase).
+# Sem ferramenta, sem dados, sem gabarito. Frases prontas em frases.md.
+# Ambiente Python: a .venv da raiz do repositório (compartilhada).
+#
+#     just sync    instala/atualiza a .venv da raiz
+#     just chave   copia a chave da raiz para esta pasta
+#     just web     abre a interface só com este agente
+#     just cli     conversa por terminal
+# =============================================================================
+
+default:
+    @just --list
+
+# Instala/atualiza a .venv da raiz.
+sync:
+    cd ../.. && uv sync --no-active
+
+# Copia a chave do AI Studio da raiz para cá.
+chave:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ ! -f ../../.env ]; then
+        echo "ERRO: não existe .env na raiz do repositório."
+        echo ""
+        echo "  1. cd ../.."
+        echo "  2. cp .env.exemplo .env"
+        echo "  3. cole a chave de https://aistudio.google.com/apikey"
+        echo "  4. just chave   (na raiz)  ou  just chave  (aqui)"
+        exit 1
+    fi
+    if grep -q "cole-sua-chave-aqui" ../../.env; then
+        echo "ERRO: o .env da raiz ainda tem o texto de exemplo no lugar da chave."
+        exit 1
+    fi
+    cp ../../.env .env
+    echo "  chave copiada para agentes/frase/"
+
+# Interface web só com este agente (http://localhost:8000).
+web:
+    @echo "Abra http://localhost:8000"
+    uv run --no-active adk web .
+
+# Conversa por terminal.
+cli:
+    uv run --no-active adk run .
+
+# Confere que este agente carrega, sem gastar chamada ao modelo.
+verificar:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    uv run --no-active python - <<'PY'
+    import importlib
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path("..").resolve()))
+    agente = importlib.import_module("frase.agent").root_agent
+    subs = getattr(agente, "sub_agents", None) or []
+    print(f"  ok  frase  {type(agente).__name__} {agente.name!r} — {len(subs)} sub-agentes: {', '.join(s.name for s in subs)}")
+    bloco = subs[0]
+    print(f"      {type(bloco).__name__} {bloco.name!r} — {', '.join(s.name for s in bloco.sub_agents)}")
+    print("\nCarregou. Nenhuma chamada ao modelo foi feita.")
+    PY

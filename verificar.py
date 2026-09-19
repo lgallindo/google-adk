@@ -18,7 +18,7 @@ from pathlib import Path
 # script quebre exatamente quando o `adk` quebraria.
 sys.path.insert(0, str(Path(__file__).parent / "agentes"))
 
-VARIANTES = ("conversa", "ferramenta", "externa", "debate", "ata")
+VARIANTES = ("conversa", "ferramenta", "externa", "debate", "ata", "paralelo", "fluxo", "pesquisa", "frase", "fontes")
 
 
 def carregar(nome: str) -> None:
@@ -27,6 +27,12 @@ def carregar(nome: str) -> None:
     ferramentas = getattr(agente, "tools", None) or []
 
     detalhes = []
+    grafo = getattr(agente, "graph", None)
+    if grafo is not None:
+        barreiras = [n.name for n in grafo.nodes if n._requires_all_predecessors]
+        detalhes.append(f"{len(grafo.nodes)} nos, {len(grafo.edges)} arestas")
+        if barreiras:
+            detalhes.append(f"barreiras: {', '.join(barreiras)}")
     if subs:
         detalhes.append(f"{len(subs)} sub-agentes: {', '.join(s.name for s in subs)}")
     if ferramentas:

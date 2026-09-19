@@ -11,6 +11,8 @@ mudou.
 | 3 | [`externa/`](externa/) | A ferramenta sai da máquina e chama uma API de verdade. | 1 |
 | 4 | [`debate/`](debate/) | Três agentes debatem 2 rodadas; um quarto julga. | **7** |
 | 4b | [`ata/`](ata/) | O mesmo debate, com as rodadas guardadas em ata. | **7** |
+| 4c | [`paralelo/`](paralelo/) | Três pareceristas ao mesmo tempo, sobre pedidos de LAI reais; eles não se escutam. | **5** |
+| 4d | [`frase/`](frase/) | O mesmo paralelo no osso: cole uma frase, três versões ao mesmo tempo. | **4** |
 
 A variante 5 mora em [`../adk-basico/`](../adk-basico/README.md), com ambiente
 próprio.

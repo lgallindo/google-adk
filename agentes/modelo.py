@@ -1,11 +1,12 @@
 """O modelo que as variantes usam.
 
-Padrão: **Qwen3 local** (`servico-qwen/`, OpenAI-compatible em
-`http://127.0.0.1:3000/v1`). Suba com `just qwen-serve` antes de `just web`.
+Padrão: **Gemini** na nuvem. Precisa de `GOOGLE_API_KEY` no `.env`
+(`cp .env.exemplo .env` e depois `just chave`).
 
-Opcional: `ADK_BACKEND=gemini` + `GOOGLE_API_KEY` para a nuvem.
+Opcional: `ADK_BACKEND=qwen3` usa o Qwen3 local de `servico-qwen/`
+(OpenAI-compatible em `http://127.0.0.1:3000/v1`, suba com `just qwen-serve`).
 
-    ADK_BACKEND=qwen3|gemini     padrão: qwen3
+    ADK_BACKEND=gemini|qwen3     padrão: gemini
     QWEN_API_BASE=http://127.0.0.1:3000/v1
     QWEN_MODEL=openai/Qwen/Qwen3-0.6B
 """
@@ -24,7 +25,7 @@ QWEN_API_BASE = os.environ.get("QWEN_API_BASE", "http://127.0.0.1:3000/v1")
 
 
 def _backend() -> str:
-    return os.environ.get("ADK_BACKEND", "qwen3").strip().lower()
+    return os.environ.get("ADK_BACKEND", "gemini").strip().lower()
 
 
 def _modelo_gemini() -> Gemini:
@@ -61,7 +62,7 @@ def _modelo_qwen() -> Any:
 
 
 def modelo() -> Any:
-    """Qwen3 local por padrão; Gemini se `ADK_BACKEND=gemini`."""
-    if _backend() in ("gemini", "google", "cloud"):
-        return _modelo_gemini()
-    return _modelo_qwen()
+    """Gemini por padrão; Qwen3 local se `ADK_BACKEND=qwen3`."""
+    if _backend() in ("qwen3", "qwen", "local"):
+        return _modelo_qwen()
+    return _modelo_gemini()

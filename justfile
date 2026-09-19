@@ -1,14 +1,14 @@
 # =============================================================================
 # Agentes do 02173 — cinco variantes, uma rampa
 #
-# Padrão: Qwen3 local em servico-qwen/ (sem chave Google).
+# Padrão: Gemini na nuvem (precisa de chave do AI Studio).
 #
 #     just sync              .venv do ADK (uma vez)
-#     just sync-qwen         .venv do serviço Qwen (uma vez)
-#     just qwen-serve        terminal 1 — modelo na porta 3000
-#     just web               terminal 2 — ADK em http://localhost:8000
+#     just chave             copia a GOOGLE_API_KEY do .env para as variantes
+#     just web               ADK em http://localhost:8000
 #
-# Gemini (opcional): ADK_BACKEND=gemini + just chave + just web-gemini
+# Qwen3 local (opcional, sem chave): just sync-qwen, just qwen-serve
+# no terminal 1 e just web-qwen no terminal 2.
 # =============================================================================
 
 PORT := env_var_or_default("PORT", "3000")
@@ -44,16 +44,25 @@ _qwen-vivo:
     echo "  Terminal 2: just web"
     exit 1
 
-# Terminal 2 — ADK (Qwen por padrão).
-web: _qwen-vivo
+# ADK com Gemini (padrão). Precisa de just chave.
+web:
+    @echo "Backend: Gemini. Abra http://localhost:8000"
+    uv run --no-active adk web agentes
+
+web-memoria:
+    @echo "Backend: Gemini + SQLite. Abra http://localhost:8000"
+    uv run --no-active adk web agentes --session_service_uri sqlite:///sessoes.db
+
+cli variante:
+    uv run --no-active adk run agentes/{{variante}}
+
+# --- Qwen3 local (opcional) --------------------------------------------------
+
+web-qwen: _qwen-vivo
     @echo "Backend: Qwen3 local. Abra http://localhost:8000"
     ADK_BACKEND=qwen3 QWEN_API_BASE="{{QWEN_API_BASE}}" uv run --no-active adk web agentes
 
-web-memoria: _qwen-vivo
-    @echo "Backend: Qwen3 local + SQLite. Abra http://localhost:8000"
-    ADK_BACKEND=qwen3 QWEN_API_BASE="{{QWEN_API_BASE}}" uv run --no-active adk web agentes --session_service_uri sqlite:///sessoes.db
-
-cli variante: _qwen-vivo
+cli-qwen variante: _qwen-vivo
     ADK_BACKEND=qwen3 QWEN_API_BASE="{{QWEN_API_BASE}}" uv run --no-active adk run agentes/{{variante}}
 
 verificar-qwen: _qwen-vivo
@@ -78,18 +87,42 @@ chave:
         echo "ERRO: ainda está cole-sua-chave-aqui no .env"
         exit 1
     fi
-    for v in conversa ferramenta externa debate ata; do
-        cp .env "agentes/$v/.env"
-        echo "  chave → agentes/$v/"
+    # Toda pasta de agentes/ que tenha agent.py. Assim uma variante nova
+    # nunca fica sem chave por esquecimento de editar esta lista.
+    for d in agentes/*/; do
+        [ -f "$d/agent.py" ] || continue
+        cp .env "$d/.env"
+        echo "  chave → $d"
     done
 
+# Alias explícito, para quando o .env do aluno tiver ADK_BACKEND=qwen3.
+
 web-gemini:
-    @echo "Backend: Gemini. Precisa de just chave."
-    @echo "Abra http://localhost:8000"
+    @echo "Backend: Gemini. Abra http://localhost:8000"
     ADK_BACKEND=gemini uv run --no-active adk web agentes
 
 cli-gemini variante:
     ADK_BACKEND=gemini uv run --no-active adk run agentes/{{variante}}
+
+# Amostra de pedidos da LAI usada pela variante paralelo.
+dados *args:
+    uv run --no-active python agentes/paralelo/dados/baixar.py {{args}}
+
+# O que tem na amostra da LAI (totais por decisão e por órgão).
+amostra:
+    uv run --no-active python agentes/paralelo/pedidos.py
+
+# Lista os 60 pedidos com o gabarito. Cola de professor — não projete.
+listar *decisao:
+    uv run --no-active python agentes/paralelo/pedidos.py listar {{decisao}}
+
+# Mostra um pedido inteiro, do jeito que o modelo o recebe.
+ver protocolo:
+    uv run --no-active python agentes/paralelo/pedidos.py ver {{protocolo}}
+
+# O gabarito de um pedido da amostra: houve recurso de verdade?
+gabarito protocolo:
+    uv run --no-active python agentes/paralelo/pedidos.py {{protocolo}}
 
 verificar *args:
     uv run --no-active python verificar.py {{args}}

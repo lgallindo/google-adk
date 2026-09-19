@@ -17,3 +17,6 @@ sessoes.db
 
 # Material de aula (distribuído fora do repositório)
 CLASSROOM-INSTALAR-ADK.md
+
+# Dados brutos da CGU (82 MB por ano) — regere com: just dados
+agentes/paralelo/dados/.cache/

@@ -17,6 +17,8 @@ que a `4` deixa à mostra.
 | 3 | [`agentes/externa`](agentes/externa/agent.py) | A ferramenta sai da máquina e chama uma API de verdade. | 1 |
 | 4 | [`agentes/debate`](agentes/debate/agent.py) | Três agentes debatem 2 rodadas; um quarto julga. | **7** |
 | 4b | [`agentes/ata`](agentes/ata/agent.py) | O mesmo debate, com as rodadas guardadas em ata em vez de sobrescritas. | **7** |
+| 4c | [`agentes/paralelo`](agentes/paralelo/agent.py) | Três pareceristas opinam ao mesmo tempo sobre um pedido de LAI real; eles não se escutam. | **5** |
+| 4d | [`agentes/frase`](agentes/frase/agent.py) | O mesmo paralelo no osso: cole uma frase, três versões ao mesmo tempo. Nada para instalar. | **4** |
 | 5 | [`adk-basico/`](adk-basico/README.md) | A ferramenta é um modelo de AM servido por HTTP, na própria pasta. | 1 |
 
 A variante 5 mora em pasta separada, com ambiente próprio, porque precisa de
