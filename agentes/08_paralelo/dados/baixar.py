@@ -2,34 +2,31 @@
 
 FONTE
 -----
-Portal de Dados Abertos da CGU, base do FalaBR (o sistema por onde entram os
-pedidos de acesso à informação do Executivo federal):
+Portal de Dados Abertos da CGU, base do FalaBR (pedidos de acesso à
+informação do Executivo federal):
 
     https://dadosabertos-download.cgu.gov.br/FalaBR/Arquivos_FalaBR_Filtrado/
 
-"Filtrado" no nome quer dizer que a CGU já tirou os dados pessoais de quem
-pediu. O que sobra é o pedido, a resposta do órgão e a decisão. Em 2025 são
-83.827 pedidos concluídos, num zip de 82 MB que vira 423 MB de CSV — grande
-demais para o repositório, e é por isso que este script existe em vez de o
-CSV estar commitado.
+"Filtrado" no nome: a CGU já removeu dados pessoais de quem pediu. Em 2025
+são 83.827 pedidos concluídos — zip de 82 MB que vira centenas de MB de CSV.
+Este script baixa, amostra e grava o JSONL pequeno que o repositório versiona.
 
 O QUE ELE FAZ
 -------------
-1. Baixa o zip do ano (com cache em `.cache/`, que o git ignora).
-2. Lê `Pedidos` e `Recursos`. Os dois se ligam por `IdPedido`.
+1. Baixa o zip do ano (cache em `.cache/`, ignorado pelo git).
+2. Lê `Pedidos` e `Recursos` (ligados por `IdPedido`).
 3. Sorteia uma amostra equilibrada por tipo de decisão.
-4. Tira e-mail, CPF, CNPJ e telefone do texto livre, por precaução.
-5. Escreve `pedidos.jsonl`, que é o arquivo pequeno e commitado.
+4. Remove e-mail, CPF, CNPJ e telefone do texto livre.
+5. Escreve `pedidos.jsonl`.
 
     just dados            # baixa e regera a amostra
     just dados --ano 2024 --n 120
 
 O GABARITO
 ----------
-Cada pedido carrega `houve_recurso`: se a pessoa recorreu da resposta, de
-verdade, na base da CGU. Isso é gabarito. Os agentes NUNCA recebem esse
-campo — `pedidos.py` o remove antes de entregar o pedido ao modelo. Ele serve
-para a turma conferir depois se o parecer de risco acertou.
+Cada pedido carrega `houve_recurso` a partir da base. Os agentes recebem o
+pedido já sem esse campo (`pedidos.py`). Serve para a turma conferir depois
+se o parecer de risco acertou.
 """
 
 from __future__ import annotations

@@ -47,10 +47,9 @@ licença Apache 2.0, para escrever agentes. Ele cuida da parte chata e repetida:
 - dar uma **interface web de teste** (`adk web`) e um modo terminal
   (`adk run`), que é como a gente roda tudo aqui.
 
-O que o ADK **não** é: ele não é o modelo. Por padrão este repo usa **Gemini**
-na nuvem (`GOOGLE_API_KEY` + `just chave`). Opcionalmente há um backend
-**local** em `servico-local/` (`ADK_BACKEND=local`). O ADK é só o código que
-fala com o modelo.
+O ADK é o código que orquestra a conversa com o modelo. Por padrão este
+repo usa **Gemini** na nuvem (`GOOGLE_API_KEY` + `just chave`). Opcionalmente
+há um backend **local** em `servico-local/` (`ADK_BACKEND=local`).
 
 ### Uma linha do tempo bem curta
 
@@ -103,9 +102,8 @@ máquina funciona" perde a graça. Ele também baixa o próprio Python que este
 projeto pede (3.12 ou mais novo), sem mexer no Python que já existe na sua
 máquina.
 
-Uma consequência prática: você **não precisa "ativar" ambiente nenhum**. As
-receitas chamam `uv run`, que entra no `.venv/` do projeto sozinho, a cada
-comando. É daí que vem o `--no-active` que você vai ver espalhado pelos
+Uma consequência prática: as receitas chamam `uv run`, que entra no
+`.venv/` do projeto sozinho, a cada comando — sem `source …/activate`. É daí que vem o `--no-active` que você vai ver espalhado pelos
 justfiles: ele manda o `uv` ignorar qualquer ambiente que você por acaso tenha
 ativado na mão e usar sempre o `.venv/` deste projeto.
 

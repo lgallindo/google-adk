@@ -6,14 +6,12 @@ O ADK na nuvem usa Gemini (`agentes/modelo.py`, padrão). Este serviço é o
 caminho **opcional** offline: sobe um modelo instruct por HTTP em
 `/v1/chat/completions`, e o LiteLLM do ADK aponta para cá.
 
-POR QUE NÃO É MAIS O Qwen3-0.6B
-------------------------------
-A versão anterior servia `Qwen/Qwen3-0.6B`. Em aula, esse tamanho **não**
-sustentava tool calling nem prompts com várias ferramentas: o modelo
-respondia em texto sem emitir a chamada da função, ou inventava argumentos.
-Para um baseline local mínimo de agentes, o instruct precisa de mais
-capacidade. O padrão atual é `Qwen/Qwen2.5-1.5B-Instruct` (ainda cabe em
-CPU com paciência; GPU acelera).
+QUAL MODELO LOCAL
+-----------------
+O padrão é `Qwen/Qwen2.5-1.5B-Instruct`: cabe em CPU com paciência, ganha
+com GPU, e sustenta tool calling mínimo em demos curtas. Instructs bem
+menores (ordem de 0,6B) conversavam sem emitir chamada de função de forma
+estável — por isso o piso da pasta é 1.5B.
 
 Troque o modelo com a variável de ambiente `MODELO` (id Hugging Face).
 O id exposto em `/v1/models` e no JSON de completions deve bater com

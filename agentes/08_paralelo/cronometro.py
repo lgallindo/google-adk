@@ -1,29 +1,26 @@
 """Cronômetro: os mesmos três pareceristas, em fila e em paralelo.
 
-Não acredite que `ParallelAgent` é mais rápido: meça. Este script monta o
-mesmo trio de `agent.py` duas vezes — uma dentro de um `SequentialAgent`,
-outra dentro de um `ParallelAgent` — dá a eles o MESMO pedido e
-cronometra. Três chamadas ao modelo de cada lado, seis no total.
+Este script monta o trio de `agent.py` duas vezes — uma dentro de um
+`SequentialAgent`, outra dentro de um `ParallelAgent` — dá a eles o MESMO
+pedido e mede o tempo de parede. Três chamadas ao modelo de cada lado, seis
+no total. A medição é o ponto: `ParallelAgent` paraleliza a espera; o ganho
+aparece quando o servidor atende as três juntas.
 
     just cronometro                       # Gemini na nuvem (padrão)
     ADK_BACKEND=local just cronometro     # modelo local
     just cronometro --protocolo 50001121584202581
 
-O porteiro e o relator ficam de fora de propósito: eles são iguais nos dois
-lados e só somariam tempo constante à medição. O pedido entra direto no
-estado da sessão, por `state_delta`, que é o mesmo lugar onde o porteiro o
-escreveria com `output_key="pedido"`.
+O porteiro e o relator ficam de fora de propósito: iguais nos dois lados, só
+somariam tempo constante. O pedido entra no estado por `state_delta`, o
+mesmo lugar onde o porteiro escreveria com `output_key="pedido"`.
 
 O QUE ESPERAR
 -------------
-Gemini: o paralelo custa mais ou menos o tempo do parecer mais lento, e o
-sequencial custa a soma dos três. Ganho perto de 3×.
+Gemini: o paralelo custa perto do parecer mais lento; o sequencial, a soma
+dos três. Ganho perto de 3×.
 
-Backend local: empate. `servico-local/` é um processo só gerando token a
-token na CPU; as três chamadas chegam juntas e entram numa fila mesmo assim.
-O `ParallelAgent` fez a parte dele, o servidor é que não tem como.
-
-A lição é essa: `ParallelAgent` paraleliza a ESPERA, não a CONTA.
+Backend local: empate. `servico-local/` gera token a token na CPU e atende
+uma requisição por vez; as três chegam juntas e entram na fila do processo.
 """
 
 from __future__ import annotations
@@ -115,7 +112,7 @@ async def main() -> None:
     print(f"  Paralelo foi {razao:.1f}× o sequencial "
           f"({t_fila:.1f}s → {t_junto:.1f}s).")
     if razao < 1.3:
-        print("  Empate. O gargalo não é a espera: é o servidor do modelo,")
+        print("  Empate. O gargalo é o servidor do modelo,")
         print("  que atende uma requisição de cada vez. Com o backend local")
         print("  isso é esperado — servico-local/ gera na CPU, um pedido por")
         print("  vez. Compare com a nuvem:  just cronometro")

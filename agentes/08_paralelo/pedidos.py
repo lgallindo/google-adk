@@ -1,20 +1,18 @@
 """Acesso à amostra de pedidos, e as ferramentas que o agente usa.
 
-O arquivo de dados é `dados/pedidos.jsonl` — 60 pedidos reais de 2025, da base
-do FalaBR da CGU. Veja `dados/README.md` para a procedência e
+O arquivo de dados é `dados/pedidos.jsonl` — 60 pedidos reais de 2025, da
+base do FalaBR da CGU. Veja `dados/README.md` para a procedência e
 `dados/baixar.py` para regerar.
 
 A REGRA DO GABARITO
 -------------------
-Cada pedido guarda `houve_recurso`: se a pessoa recorreu de verdade. Nenhuma
-função deste arquivo que o modelo possa chamar devolve esse campo —
-`_sem_gabarito()` remove antes de entregar. O gabarito sai só por
-`conferir_gabarito()`, que é para a turma rodar DEPOIS, no terminal, e não
-está na lista de ferramentas de nenhum agente.
+Cada pedido guarda `houve_recurso`: se a pessoa recorreu de verdade. As
+funções que o modelo pode chamar passam por `_sem_gabarito()` e entregam o
+pedido sem esse campo. O gabarito sai só por `conferir_gabarito()`, no
+terminal, depois do parecer — fora da lista de ferramentas do agente.
 
-Se o modelo pudesse ler o gabarito, o parecer de risco deixaria de ser uma
-previsão e viraria uma consulta. É o erro mais comum em demonstração de
-agente: dar ao modelo a resposta e se impressionar quando ele acerta.
+Assim o parecer de risco continua sendo previsão: a turma confere o acerto
+com `just gabarito <protocolo>`.
 """
 
 from __future__ import annotations

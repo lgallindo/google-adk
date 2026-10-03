@@ -1,11 +1,11 @@
-"""Confere que as variantes de agentes/ carregam, sem gastar chamada.
+"""Confere que as variantes de agentes/ carregam, sem gastar chamada ao modelo.
 
-Importar o módulo do agente já valida o que mais quebra na prática: nome de
-classe errado, `output_key` em agente que não é LlmAgent, sub-agente faltando,
-docstring de ferramenta mal formada. Nada aqui fala com a API do Gemini.
+Importar o módulo do agente valida o que mais quebra na prática: nome de
+classe, `output_key`, sub-agente faltando, docstring de ferramenta mal
+formada. Nenhuma chamada à API do Gemini.
 
-    just verificar          só carrega as pastas numeradas
-    just verificar --api    carrega e ainda testa a BrasilAPI de verdade
+    just verificar          carrega as pastas numeradas
+    just verificar --api    carrega e testa a BrasilAPI de verdade
 """
 
 import importlib

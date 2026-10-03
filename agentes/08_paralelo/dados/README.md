@@ -25,11 +25,11 @@ pedidos de acesso à informação do Executivo federal:
   tirando e-mail, CPF, CNPJ e telefone que tenham sobrado no texto livre —
   são 14 remoções nesta amostra.
 
-## Por que a amostra não tem a proporção da base real
+## Como a amostra foi equilibrada
 
-Na base, 74% dos pedidos são "Acesso Concedido". Uma amostra fiel teria quase
-só concessão, e a aula ficaria sem o caso interessante. As cotas estão no topo
-de `baixar.py`:
+Na base, 74% dos pedidos são "Acesso Concedido". A amostra desta pasta usa
+cotas por tipo de decisão para caber concessão, parcial, negativa e os
+demais casos na mesma aula. As cotas estão no topo de `baixar.py`:
 
 | Decisão | Na amostra | Na base 2025 |
 | --- | --- | --- |

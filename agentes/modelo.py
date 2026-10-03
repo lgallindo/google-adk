@@ -1,7 +1,7 @@
 """O modelo que as variantes usam.
 
 Padrão: **Gemini** na nuvem (`gemini-3.1-flash-lite`).
-Precisa de `GOOGLE_API_KEY` no `.env` (`cp .env.exemplo .env` e `just chave`).
+Configure `GOOGLE_API_KEY` no `.env` (`cp .env.exemplo .env` e `just chave`).
 
 Opcional — backend local OpenAI-compatible em `servico-local/`:
 
@@ -11,12 +11,9 @@ Opcional — backend local OpenAI-compatible em `servico-local/`:
 
 Suba o serviço com `just local-serve` e o ADK com `just web-local`.
 
-Histórico: um modelo bem pequeno (ordem de 0,6B parâmetros) foi tentado aqui
-para aulas offline. Em prática ele **não** seguia tool calling nem prompts
-com várias ferramentas de forma estável — o agente “conversava” sem chamar
-funções, ou inventava argumentos. O serviço local atual usa um instruct
-maior (`Qwen2.5-1.5B-Instruct` por padrão) precisamente para tool calling
-mínimo; o caminho da disciplina e da AV2 continua sendo **Gemini**.
+O caminho local padrão é `Qwen2.5-1.5B-Instruct`: instruct pequeno o bastante
+para CPU com paciência e grande o bastante para tool calling mínimo em demo.
+A disciplina e a AV2 usam Gemini.
 """
 
 from __future__ import annotations
