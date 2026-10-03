@@ -1,10 +1,10 @@
-"""Confere que as cinco variantes de agentes/ carregam, sem gastar chamada.
+"""Confere que as variantes de agentes/ carregam, sem gastar chamada.
 
 Importar o módulo do agente já valida o que mais quebra na prática: nome de
 classe errado, `output_key` em agente que não é LlmAgent, sub-agente faltando,
 docstring de ferramenta mal formada. Nada aqui fala com a API do Gemini.
 
-    just verificar          só carrega as cinco
+    just verificar          só carrega as pastas numeradas
     just verificar --api    carrega e ainda testa a BrasilAPI de verdade
 """
 
@@ -18,7 +18,18 @@ from pathlib import Path
 # script quebre exatamente quando o `adk` quebraria.
 sys.path.insert(0, str(Path(__file__).parent / "agentes"))
 
-VARIANTES = ("conversa", "ferramenta", "externa", "debate", "ata", "paralelo", "fluxo", "pesquisa", "frase", "fontes")
+VARIANTES = (
+    "00_conversa",
+    "01_ferramenta",
+    "02_externa",
+    "03_fluxo",
+    "04_frase",
+    "05_fontes",
+    "06_debate",
+    "07_ata",
+    "08_paralelo",
+    "09_pesquisa",
+)
 
 
 def carregar(nome: str) -> None:
@@ -40,11 +51,15 @@ def carregar(nome: str) -> None:
         detalhes.append(f"{len(ferramentas)} ferramentas: {', '.join(nomes)}")
 
     sufixo = f" — {' · '.join(detalhes)}" if detalhes else ""
-    print(f"  ok  {nome:12} {type(agente).__name__} {agente.name!r}{sufixo}")
+    print(f"  ok  {nome:14} {type(agente).__name__} {agente.name!r}{sufixo}")
 
 
 def testar_api() -> None:
-    from externa.agent import consultar_cep, feriados_do_ano, proximo_feriado
+    import importlib
+    externa = importlib.import_module("02_externa.agent")
+    consultar_cep = externa.consultar_cep
+    feriados_do_ano = externa.feriados_do_ano
+    proximo_feriado = externa.proximo_feriado
 
     print("\n  BrasilAPI (chamadas de verdade, sem modelo):")
     prox = proximo_feriado()

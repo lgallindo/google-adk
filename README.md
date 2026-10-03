@@ -5,19 +5,26 @@ do Google** — a biblioteca que a gente usa para montar agentes: modelos de
 linguagem que decidem sozinhos quando chamar uma função sua.
 
 Cada pasta é um agente inteiro e se explica sozinha: o cabeçalho do `agent.py`
-diz o que aquela pasta faz e por que ela existe. A tabela abaixo é só um
-índice, da mais simples para a mais cara.
+diz o que aquela pasta faz e por que ela existe. A numeração sobe com a
+**complexidade do código** (orquestração, ferramentas, dados).
 
-| Pasta | A ideia | Chamadas ao modelo |
+Os nomes usam `_` (não hífen): o ADK só aceita identificadores Python
+(`[A-Za-z0-9_]`), então a pasta é `00_conversa`, não `00-conversa`.
+
+
+| Pasta | Razão de ser | Chamadas |
 | --- | --- | --- |
-| [`agentes/conversa`](agentes/conversa/agent.py) | Um agente é um modelo com uma instrução. Nada mais. | 1 |
-| [`agentes/ferramenta`](agentes/ferramenta/agent.py) | Ferramenta é uma função Python — nove delas. A docstring vira a especificação. | 1 |
-| [`agentes/externa`](agentes/externa/agent.py) | A ferramenta sai da máquina e chama uma API de verdade. | 1 |
-| [`agentes/debate`](agentes/debate/agent.py) | Três agentes debatem 2 rodadas; um quarto julga. | **7** |
-| [`agentes/ata`](agentes/ata/agent.py) | Um debate de duas rodadas, com as falas guardadas em ata em vez de sobrescritas. | **7** |
-| [`agentes/paralelo`](agentes/paralelo/agent.py) | Três pareceristas opinam ao mesmo tempo sobre um pedido de acesso à informação real; eles não se escutam. | **5** |
-| [`agentes/frase`](agentes/frase/agent.py) | `ParallelAgent` no osso: cole uma frase, três versões ao mesmo tempo. Nada para instalar. | **4** |
-| [`adk-basico/`](adk-basico/README.md) | A ferramenta é um modelo de AM servido por HTTP, na própria pasta. | 1 |
+| [`agentes/00_conversa`](agentes/00_conversa/agent.py) | Ligar o microfone: modelo + instrução. | 1 |
+| [`agentes/01_ferramenta`](agentes/01_ferramenta/agent.py) | Mãos em Python; a docstring é a especificação. | 1 |
+| [`agentes/02_externa`](agentes/02_externa/agent.py) | A ferramenta fala com a BrasilAPI. | 1 |
+| [`agentes/03_fluxo`](agentes/03_fluxo/agent.py) | Orquestração como grafo em linha. | 2 |
+| [`agentes/04_frase`](agentes/04_frase/agent.py) | Uma frase, três reescritas juntas. | **4** |
+| [`agentes/05_fontes`](agentes/05_fontes/agent.py) | Leque + barreira + relatório. | ~5 |
+| [`agentes/06_debate`](agentes/06_debate/agent.py) | Três vozes em laço; um mediador. | **7** |
+| [`agentes/07_ata`](agentes/07_ata/agent.py) | O debate com ata no estado. | **7** |
+| [`agentes/08_paralelo`](agentes/08_paralelo/agent.py) | Pareceristas sobre pedido real da CGU. | **5** |
+| [`agentes/09_pesquisa`](agentes/09_pesquisa/agent.py) | Pipeline de pesquisa com dois abre-e-fecha. | **11** |
+| [`adk-basico/`](adk-basico/README.md) | Modelo tabular via HTTP (ambiente próprio). | 1 |
 
 O `adk-basico/` mora em pasta separada, com ambiente próprio, porque precisa de
 dois terminais e de bibliotecas que as outras não usam. Ela é
@@ -40,9 +47,10 @@ licença Apache 2.0, para escrever agentes. Ele cuida da parte chata e repetida:
 - dar uma **interface web de teste** (`adk web`) e um modo terminal
   (`adk run`), que é como a gente roda tudo aqui.
 
-O que o ADK **não** é: ele não é o modelo. Por padrão este repo usa **Qwen3
-local** (`servico-qwen/`). Opcionalmente usa **Gemini** na nuvem
-(`ADK_BACKEND=gemini` + chave). O ADK é só o código que fala com o modelo.
+O que o ADK **não** é: ele não é o modelo. Por padrão este repo usa **Gemini**
+na nuvem (`GOOGLE_API_KEY` + `just chave`). Opcionalmente há um backend
+**local** em `servico-local/` (`ADK_BACKEND=local`). O ADK é só o código que
+fala com o modelo.
 
 ### Uma linha do tempo bem curta
 
@@ -101,10 +109,11 @@ comando. É daí que vem o `--no-active` que você vai ver espalhado pelos
 justfiles: ele manda o `uv` ignorar qualquer ambiente que você por acaso tenha
 ativado na mão e usar sempre o `.venv/` deste projeto.
 
-São **dois** ambientes aqui, e de propósito: um na raiz, para as cinco
-pastas de `agentes/`, e outro dentro de `adk-basico/`, que precisa também do
-BentoML e do scikit-learn. Cada um tem o seu `pyproject.toml` e o seu
-`uv.lock`, e cada um pede o seu `just sync`.
+São **dois** ambientes aqui, e de propósito: um na raiz, para as pastas
+numeradas de `agentes/` (`00` … `09`), e outro dentro de `adk-basico/`, que
+precisa também do BentoML e do scikit-learn. Cada um tem o seu
+`pyproject.toml` e o seu `uv.lock`, e cada um pede o seu `just sync`.
+Backend local opcional: terceiro ambiente em `servico-local/` (`just sync-local`).
 
 ---
 
@@ -122,19 +131,16 @@ ver as receitas disponíveis.
 
 ---
 
-## O que é uma chave de API (só se for usar Gemini)
+## O que é uma chave de API (Gemini — padrão)
 
-O caminho **padrão** deste repo é Qwen3 local — **não precisa de chave**.
-
-Gemini é opcional (`just web-gemini`). Aí sim: quando o agente "pensa", o ADK
-faz HTTP para o Google. A **chave de API** identifica a sua conta e a cota.
+Quando o agente "pensa", o ADK faz HTTP para o Google. A **chave de API**
+identifica a sua conta e a cota.
 
 1. **Chave é senha.** Não cole em slide, WhatsApp da turma, nem no git. Mora
    em `.env` (gitignored); no git só existe `.env.exemplo`.
-2. **Sem chave válida, só o caminho Gemini quebra** — o Qwen local continua
-   normal.
+2. Sem chave válida o caminho padrão (Gemini) não sobe.
 
-### Pegando uma chave (opcional)
+### Pegando uma chave
 
 1. <https://aistudio.google.com/apikey> com Gmail **pessoal** (conta de
    faculdade/Workspace costuma bloquear).
@@ -168,47 +174,49 @@ lugar errado.
 
 ```bash
 just sync                 # .venv do ADK
-just sync-qwen            # .venv do servico-qwen (torch CPU + BentoML)
 ```
 
-O `adk-basico/` tem ambiente próprio — veja o README dela.
+O `adk-basico/` tem ambiente próprio — veja o README dela.  
+Backend local opcional: `just sync-local` (torch CPU + BentoML em `servico-local/`).
 
-## Rodar (Qwen local — padrão)
-
-Dois terminais:
-
-```bash
-just qwen-serve           # terminal 1 — modelo (porta 3000)
-just web                  # terminal 2 — http://localhost:8000
-```
-
-Comece pela pasta **conversa**. No terminal: `just cli conversa`.
-
-Se a porta 3000 estiver ocupada:
-
-```bash
-PORT=3001 just qwen-serve
-QWEN_API_BASE=http://127.0.0.1:3001/v1 just web
-```
-
-Smoke do modelo sem abrir o ADK: `just verificar-qwen`.
-
-## Rodar com Gemini (opcional)
+## Rodar (Gemini — padrão)
 
 ```bash
 cp .env.exemplo .env      # cole a auth key do AI Studio
 just chave
-just web-gemini
-# ou: just cli-gemini conversa
+just web                  # http://localhost:8000
+# ou: just cli 00_conversa
 ```
 
-Antes de gastar cota na nuvem:
+Comece por **`00_conversa`**, depois `01_ferramenta`.
+
+Antes de gastar cota:
 
 ```bash
 just verificar
 just testar-api
 ```
-## Por que a `ferramenta` existe
+
+## Rodar com modelo local (opcional)
+
+Dois terminais — só se não for usar Gemini:
+
+```bash
+just sync-local
+just local-serve          # terminal 1 — porta 3000
+just web-local            # terminal 2 — http://localhost:8000
+```
+
+Se a porta 3000 estiver ocupada:
+
+```bash
+PORT=3001 just local-serve
+LOCAL_API_BASE=http://127.0.0.1:3001/v1 just web-local
+```
+
+Smoke sem abrir o ADK: `just verificar-local`.
+
+## Por que a `01_ferramenta` existe
 
 Isto foi medido em **09/09/2026**, com a mesma pergunta, no mesmo dia, com o
 mesmo modelo. A única diferença é que a segunda tem uma ferramenta.
@@ -216,8 +224,8 @@ mesmo modelo. A única diferença é que a segunda tem uma ferramenta.
 ```
 pergunta:  "Quantos dias faltam para 2026-09-24?"
 
-conversa    -> "Faltam exatamente 668 dias para essa data."     ERRADO
-ferramenta  -> "Faltam exatamente 15 dias para o dia 24/09."    CERTO
+00_conversa     -> "Faltam exatamente 668 dias para essa data."     ERRADO
+01_ferramenta   -> "Faltam exatamente 15 dias para o dia 24/09."    CERTO
 ```
 
 Repare que os **dois** disseram *"exatamente"*. O primeiro não tem como saber
@@ -229,10 +237,10 @@ de QA responde *"terça-feira"* para uma pergunta de *"quando"*, com score
 **maior** que o das respostas certas. Modelo confiante e modelo correto são
 coisas diferentes, e nenhum painel de servidor distingue as duas.
 
-## Por que o `debate` é caro
+## Por que o `06_debate` é caro
 
 Sete chamadas por pergunta: 3 debatedores × 2 rodadas + 1 mediador. Isso é
-**sete vezes** o custo e a latência da `conversa`, e nada na tela avisa.
+**sete vezes** o custo e a latência da `00_conversa`, e nada na tela avisa.
 
 E não é só custo. Medido no mesmo dia, seis chamadas seguidas a
 `gemini-3.1-flash-lite` na cota gratuita deram **3 sucessos e 3 erros 503**. Com
@@ -246,9 +254,9 @@ confiabilidade de cada passo entra elevada a N.** Encadear agentes multiplica a
 fragilidade tão rápido quanto multiplica o custo. Repetição compra resiliência
 contra falha transitória — não contra indisponibilidade.
 
-## O que a `ata` conserta
+## O que a `07_ata` conserta
 
-A `debate` funciona, e é justamente por funcionar que ela ensina: os três
+A `06_debate` funciona, e é justamente por funcionar que ela ensina: os três
 defeitos dela são de **estado**, e nenhum deles aparece na resposta.
 
 O mecanismo é o `output_key`. Cada debatedor grava a própria fala numa chave da
@@ -268,7 +276,7 @@ compartilhada — e tem os problemas de uma variável compartilhada:
    para estados diferentes, e isso não está escrito em lugar nenhum — está
    implícito na ordem da lista de `sub_agents`.
 
-A `ata` resolve os três com duas peças do ADK que a `debate` não usa:
+A `07_ata` resolve os três com duas peças do ADK que a `06_debate` não usa:
 
 - **`after_agent_callback`** — roda depois de cada debatedor, na janela em que
   a fala já está na chave e a próxima rodada ainda não a sobrescreveu. Ele
@@ -294,32 +302,32 @@ O custo não muda: continuam sete chamadas. O que aumenta é o **número de
 tokens** — a ata viaja no prompt de todo mundo e o histórico da conversa
 continua viajando também.
 
-E um defeito que a `4b` não conserta, porque não é dela: o estado morre com o
+E um defeito que a `07_ata` não conserta, porque não é dela: o estado morre com o
 processo. Quem escolhe onde guardar sessão não é o `agent.py`, é quem sobe o
 servidor. `just web` usa memória; `just web-memoria` sobe o mesmo servidor com
 um SQLite ao lado, e aí a ata sobrevive a um Ctrl+C.
 
 ## O que dá para mexer em aula
 
-- **`conversa`** — mude a instrução e veja o comportamento mudar sem tocar em código.
-- **`ferramenta`** — apague a linha `data:` do bloco `Args` da docstring e veja o
+- **`00_conversa`** — mude a instrução e veja o comportamento mudar sem tocar em código.
+- **`01_ferramenta`** — apague a linha `data:` do bloco `Args` da docstring e veja o
   agente começar a errar o formato. A docstring **é** a especificação.
   Peça também *"anote isso no seu arquivo"* e depois *"apague tudo"*: é a
   única ferramenta das nove que **muda** alguma coisa na sua máquina, e nada
   na tela pede confirmação.
-- **`externa`** — desligue o wi-fi e veja a ferramenta devolver `{"erro": ...}`
+- **`02_externa`** — desligue o wi-fi e veja a ferramenta devolver `{"erro": ...}`
   em vez de derrubar o turno.
-- **`debate`** — mude `max_iterations` de 2 para 1 e compare custo e qualidade.
+- **`06_debate`** — mude `max_iterations` de 2 para 1 e compare custo e qualidade.
   Ou acrescente um quarto debatedor e veja quantas chamadas isso vira.
-- **`ata`** — rode a mesma pergunta nas duas e abra a aba **State** do
-  `adk web` lado a lado: a `debate` termina com três falas guardadas, a `ata`
-  com seis. Depois comente o `after_agent_callback=registrar` de um dos três e
-  veja a ata ficar com furo — sem nenhum erro na tela.
+- **`07_ata`** — rode a mesma pergunta nas duas e abra a aba **State** do
+  `adk web` lado a lado: a `06_debate` termina com três falas guardadas, a
+  `07_ata` com seis. Depois comente o `after_agent_callback=registrar` de um
+  dos três e veja a ata ficar com furo — sem nenhum erro na tela.
 
 ## Onde isto encosta no resto do curso
 
-`agentes/externa` e `~/bentoml-roberta/api/` usam **a mesma** BrasilAPI de dois
-jeitos diferentes: o agente **chama** a API e lê o JSON; o serviço de QA
+`agentes/02_externa` e `~/bentoml-roberta/api/` usam **a mesma** BrasilAPI de
+dois jeitos diferentes: o agente **chama** a API e lê o JSON; o serviço de QA
 transforma o JSON em prosa e **grifa** a resposta dentro do texto. Mesma fonte,
 duas arquiteturas, dois modos de errar. Vale abrir os dois lado a lado.
 
@@ -334,7 +342,7 @@ duas arquiteturas, dois modos de errar. Vale abrir os dois lado a lado.
 | `503 ... high demand` | o servidor recusou. O `modelo.py` já repete sozinho; se insistir, espere |
 | `adk: command not found` | você rodou fora do `uv run`. Use as receitas do `just` |
 | A interface web não abre | ela sobe em <http://localhost:8000>, e o terminal fica ocupado enquanto ela está de pé |
-| `ERRO: Qwen não responde` | `just qwen-serve` noutro terminal; espere carregar; depois `just web` |
+| `ERRO: serviço local não responde` | `just local-serve` noutro terminal; espere carregar; depois `just web-local` |
 | `LiteLLM support requires: google-adk[extensions]` | o `.venv` estava quebrado (shebang apontava para outra aula) ou você ativou outro venv. Rode `deactivate`, depois `rm -rf .venv && just sync`. **Não** use `source …/activate` |
-| porta 3000 ocupada | `PORT=3001 just qwen-serve` e `QWEN_API_BASE=http://127.0.0.1:3001/v1 just web` |
-| Qwen lento / máquina pesada | normal em CPU com `debate`/`ata` (7 chamadas); use `conversa` ou `just web-gemini` |
+| porta 3000 ocupada | `PORT=3001 just local-serve` e `LOCAL_API_BASE=http://127.0.0.1:3001/v1 just web-local` |
+| Local lento / máquina pesada | normal em CPU com `06_debate`/`07_ata` (7 chamadas); use `00_conversa` ou fique no Gemini (`just web`) |
