@@ -4,7 +4,7 @@ Este arquivo é o **outro lado** do agente. Ele carrega um modelo já treinado
 (`modelo.joblib`, aqui nesta pasta) e o expõe num endpoint HTTP. O agente, em
 `triagem/agent.py`, chama esse endpoint como se fosse uma função sua.
 
-O modelo estima o risco de um pedido da Lei de Acesso à Informação virar
+O modelo estima o risco de um pedido de acesso à informação virar
 recurso. Ele vem pronto: treinar não é o assunto desta pasta.
 
 Repare que o caminho do modelo é relativo a ESTE arquivo, e não ao diretório de

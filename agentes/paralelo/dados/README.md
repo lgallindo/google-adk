@@ -1,4 +1,4 @@
-# `dados/` — 60 pedidos de LAI reais
+# `dados/` — 60 pedidos de acesso à informação reais
 
 ## O que tem aqui
 
@@ -11,7 +11,7 @@
 ## Procedência
 
 Portal de Dados Abertos da CGU, base do FalaBR — o sistema por onde entram os
-pedidos de Lei de Acesso à Informação do Executivo federal:
+pedidos de acesso à informação do Executivo federal:
 
 <https://dadosabertos-download.cgu.gov.br/FalaBR/Arquivos_FalaBR_Filtrado/>
 

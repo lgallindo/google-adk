@@ -1,8 +1,8 @@
-"""Variante 4c — três pareceres ao mesmo tempo, sobre um pedido de LAI real.
+"""paralelo — três pareceres ao mesmo tempo, sobre um pedido real.
 
-A variante `debate` põe três agentes em FILA: o cético lê o que a otimista
-escreveu, o pragmático lê os dois. Aqui a fila some. Os três rodam JUNTOS,
-sobre um pedido de verdade da base da CGU (`dados/`, 60 pedidos de 2025).
+Três pareceristas analisam o MESMO pedido ao mesmo tempo, cada um por um
+ângulo, e um relator costura o que eles escreveram. O pedido é de verdade: vem
+da base da CGU (`dados/`, 60 pedidos de 2025).
 
     SequentialAgent "paralelo"
     ├── LlmAgent "porteiro"            busca o pedido -> state["pedido"]
@@ -14,12 +14,12 @@ sobre um pedido de verdade da base da CGU (`dados/`, 60 pedidos de 2025).
 
 Cinco chamadas ao modelo: 1 porteiro + 3 pareceres + 1 relator.
 
-A UMA IDEIA NOVA: ELES NÃO SE ESCUTAM
--------------------------------------
-No `debate`, cada agente interpola `{arg_otimista}` na instrução e lê a fala
-do colega. Aqui isso é IMPOSSÍVEL, e não é limitação do ADK: é aritmética. Os
-três começam no mesmo instante, então quando o jurídico monta o prompt dele o
-parecer de mérito ainda não existe. Não há o que ler.
+ELES NÃO SE ESCUTAM
+-------------------
+Numa FILA, um agente interpola na instrução a chave que o anterior gravou e lê
+a fala do colega. Aqui isso é IMPOSSÍVEL, e não é limitação do ADK: é
+aritmética. Os três começam no mesmo instante, então quando o jurídico monta o
+prompt dele o parecer de mérito ainda não existe. Não há o que ler.
 
 Repare no que eles CONSEGUEM ler: `{pedido}`, que o porteiro escreveu ANTES
 do bloco paralelo. Estado escrito antes de o bloco começar todo mundo enxerga;
@@ -99,7 +99,7 @@ def criar_pareceristas() -> list[Agent]:
     juridico = Agent(
         name="juridico",
         model=modelo(),
-        description="Confere se a decisão do órgão se sustenta na LAI.",
+        description="Confere se a decisão do órgão se sustenta na lei.",
         instruction=(
             "Você é a parecerista jurídica. Pergunte se a decisão do órgão se "
             "sustenta na Lei 12.527/2011: se houve negativa ou restrição, o "
@@ -184,7 +184,7 @@ relator = Agent(
     instruction=(
         "Três pareceristas analisaram o mesmo pedido de acesso à informação "
         "em paralelo, sem conversar entre si:\n"
-        "- jurídico (a decisão se sustenta na LAI?): {parecer_juridico?}\n"
+        "- jurídico (a decisão se sustenta na lei?): {parecer_juridico?}\n"
         "- mérito (a resposta responde?): {parecer_merito?}\n"
         "- risco (a pessoa vai recorrer?): {parecer_risco?}\n\n"
         "Escreva em quatro partes, nesta ordem:\n"
@@ -206,8 +206,8 @@ relator = Agent(
 root_agent = SequentialAgent(
     name="paralelo",
     description=(
-        "Busca um pedido de LAI real, manda três pareceristas analisarem ao "
-        "mesmo tempo e costura o resultado."
+        "Busca um pedido de acesso à informação real, manda três "
+        "pareceristas analisarem ao mesmo tempo e costura o resultado."
     ),
     sub_agents=[porteiro, pareceres, relator],
 )

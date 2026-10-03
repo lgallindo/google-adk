@@ -1,4 +1,4 @@
-"""Acesso à amostra de pedidos da LAI, e as ferramentas que o agente usa.
+"""Acesso à amostra de pedidos, e as ferramentas que o agente usa.
 
 O arquivo de dados é `dados/pedidos.jsonl` — 60 pedidos reais de 2025, da base
 do FalaBR da CGU. Veja `dados/README.md` para a procedência e

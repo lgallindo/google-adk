@@ -1,7 +1,7 @@
-# Variante 3 — `externa`
+# `externa`
 
-Mesma estrutura de [`ferramenta`](../ferramenta/): funções + `tools=[...]`.
-Aqui as funções fazem HTTP para a [BrasilAPI](https://brasilapi.com.br)
+Estrutura de sempre — funções + `tools=[...]` —, só que aqui as funções
+fazem HTTP para a [BrasilAPI](https://brasilapi.com.br)
 (aberta, sem chave).
 
 ## A ideia

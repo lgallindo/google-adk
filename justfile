@@ -104,11 +104,11 @@ web-gemini:
 cli-gemini variante:
     ADK_BACKEND=gemini uv run --no-active adk run agentes/{{variante}}
 
-# Amostra de pedidos da LAI usada pela variante paralelo.
+# Amostra de pedidos de acesso à informação usada pela variante paralelo.
 dados *args:
     uv run --no-active python agentes/paralelo/dados/baixar.py {{args}}
 
-# O que tem na amostra da LAI (totais por decisão e por órgão).
+# O que tem na amostra (totais por decisão e por órgão).
 amostra:
     uv run --no-active python agentes/paralelo/pedidos.py
 

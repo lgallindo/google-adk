@@ -1,6 +1,6 @@
-"""Variante 2 — ferramenta é uma função Python. Só isso.
+"""ferramenta — ferramenta é uma função Python. Só isso.
 
-A diferença para a variante `conversa` são as funções abaixo e a linha
+O que dá ferramentas a este agente são as funções abaixo e a linha
 `tools=[...]` no fim. Não existe registro de ferramentas, não existe arquivo de
 configuração, não existe JSON Schema escrito à mão.
 
@@ -30,8 +30,8 @@ agente começar a errar o formato da data.
 
 O QUE ISSO CONSERTA
 -------------------
-Na variante `conversa` o agente inventava contas e não sabia que dia era hoje.
-Aqui ele não precisa saber: quem conta é Python, que não erra aritmética, e
+Um modelo sozinho inventa contas e não sabe que dia é hoje. Aqui ele não
+precisa saber: quem conta é Python, que não erra aritmética, e
 quem olha o relógio é o sistema operacional. O modelo só decide QUANDO chamar
 e COM QUAIS argumentos.
 

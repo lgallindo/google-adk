@@ -1,4 +1,4 @@
-"""Variante 4 — três agentes debatem por duas rodadas e um quarto julga.
+"""debate — três agentes debatem por duas rodadas e um quarto julga.
 
 Aqui o `root_agent` **não é um modelo**. É um orquestrador: um
 `SequentialAgent` que roda duas coisas em ordem, e a primeira delas é um
@@ -12,8 +12,8 @@ Aqui o `root_agent` **não é um modelo**. É um orquestrador: um
     └── LlmAgent "mediador"          lê os três e decide
 
 Sete chamadas ao modelo por pergunta: 3 debatedores × 2 rodadas + 1 mediador.
-Na cota gratuita do AI Studio isso passa, mas **é sete vezes o custo da
-variante `conversa`** — e nada na tela avisa. Um agente que orquestra outros
+Na cota gratuita do AI Studio isso passa, mas **é sete vezes o custo de um
+agente sozinho** — e nada na tela avisa. Um agente que orquestra outros
 agentes multiplica custo e latência de um jeito que não aparece no código.
 
 COMO OS AGENTES CONVERSAM

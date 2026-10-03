@@ -1,10 +1,9 @@
-# Variante 4b — `ata`
+# `ata`
 
-O mesmo debate de [`debate`](../debate/): três debatedores, **duas** rodadas, um
-mediador, **sete** chamadas. O que muda é **o que sobra no estado** quando
-acaba.
+Um debate: três debatedores, **duas** rodadas, um mediador, **sete** chamadas.
+O assunto da pasta é **o que sobra no estado** quando ele acaba.
 
-## O que a `debate` deixa à mostra (e isto conserta)
+## Três armadilhas de estado (e o que isto faz com elas)
 
 1. **`output_key` sobrescreve** — a fala da rodada 1 some na rodada 2.
    → `after_agent_callback` (`registrar`) copia cada fala para o fim de
@@ -15,7 +14,7 @@ acaba.
    com dois.
    → Os três usam a **mesma** função de instrução e a mesma transcrição.
 
-## Ferramenta nova: instrução que é função
+## Instrução que é função, não string
 
 `instruction=` aceita string **ou** callable. Uma lista não cabe em
 `{ata}` (viraria o `repr` do Python), então a transcrição é montada com um
@@ -24,7 +23,7 @@ acaba.
 Armadilha: `state["ata"] = nova_lista` registra a mudança;
 `state["ata"].append(...)` **não** (quebra quando a sessão vai para o banco).
 
-## O que esta variante não conserta
+## O que esta pasta não conserta
 
 O estado ainda morre com o processo se o servidor for em memória.
 `just web-memoria` grava sessão num SQLite (`sessoes.db`) e a ata sobrevive a

@@ -1,21 +1,21 @@
-# Agentes — cinco variantes
+# Agentes
 
-Cada subpasta é um agente completo. A diferença entre uma e a seguinte é
-**uma ideia só**. Leia na ordem; o cabeçalho de cada `agent.py` explica o que
-mudou.
+Cada subpasta é um agente completo e se explica sozinha: o cabeçalho do
+`agent.py` diz o que aquela pasta faz e por que ela existe. A tabela abaixo é
+só um índice, da mais simples para a mais cara.
 
-| # | Pasta | A ideia nova | Chamadas ao modelo |
-| --- | --- | --- | --- |
-| 1 | [`conversa/`](conversa/) | Um agente é um modelo com uma instrução. | 1 |
-| 2 | [`ferramenta/`](ferramenta/) | Ferramenta é uma função Python — a docstring vira a especificação. | 1 |
-| 3 | [`externa/`](externa/) | A ferramenta sai da máquina e chama uma API de verdade. | 1 |
-| 4 | [`debate/`](debate/) | Três agentes debatem 2 rodadas; um quarto julga. | **7** |
-| 4b | [`ata/`](ata/) | O mesmo debate, com as rodadas guardadas em ata. | **7** |
-| 4c | [`paralelo/`](paralelo/) | Três pareceristas ao mesmo tempo, sobre pedidos de LAI reais; eles não se escutam. | **5** |
-| 4d | [`frase/`](frase/) | O mesmo paralelo no osso: cole uma frase, três versões ao mesmo tempo. | **4** |
+| Pasta | A ideia | Chamadas ao modelo |
+| --- | --- | --- |
+| [`conversa/`](conversa/) | Um agente é um modelo com uma instrução. | 1 |
+| [`ferramenta/`](ferramenta/) | Ferramenta é uma função Python — a docstring vira a especificação. | 1 |
+| [`externa/`](externa/) | A ferramenta sai da máquina e chama uma API de verdade. | 1 |
+| [`debate/`](debate/) | Três agentes debatem 2 rodadas; um quarto julga. | **7** |
+| [`ata/`](ata/) | Um debate de duas rodadas, com as falas guardadas em ata. | **7** |
+| [`paralelo/`](paralelo/) | Três pareceristas ao mesmo tempo, sobre pedidos de acesso à informação reais; eles não se escutam. | **5** |
+| [`frase/`](frase/) | `ParallelAgent` no osso: cole uma frase, três versões ao mesmo tempo. | **4** |
 
-A variante 5 mora em [`../adk-basico/`](../adk-basico/README.md), com ambiente
-próprio.
+O [`../adk-basico/`](../adk-basico/README.md) mora em pasta separada, com
+ambiente próprio.
 
 ## Arquivos desta pasta
 

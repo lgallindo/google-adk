@@ -4,25 +4,23 @@ Este repositório existe para **experimentar com o Agent Development Kit (ADK)
 do Google** — a biblioteca que a gente usa para montar agentes: modelos de
 linguagem que decidem sozinhos quando chamar uma função sua.
 
-São cinco variantes e uma emenda. Cada variante é um agente inteiro, e a
-diferença entre uma e a seguinte é **uma ideia só**. Leia na ordem; cada
-`agent.py` explica no cabeçalho o que mudou em relação ao anterior. A `4b` é a
-exceção: ela não traz ideia nova de agente, ela conserta os defeitos de estado
-que a `4` deixa à mostra.
+Cada pasta é um agente inteiro e se explica sozinha: o cabeçalho do `agent.py`
+diz o que aquela pasta faz e por que ela existe. A tabela abaixo é só um
+índice, da mais simples para a mais cara.
 
-| # | Pasta | A ideia nova | Chamadas ao modelo |
-| --- | --- | --- | --- |
-| 1 | [`agentes/conversa`](agentes/conversa/agent.py) | Um agente é um modelo com uma instrução. Nada mais. | 1 |
-| 2 | [`agentes/ferramenta`](agentes/ferramenta/agent.py) | Ferramenta é uma função Python — nove delas. A docstring vira a especificação. | 1 |
-| 3 | [`agentes/externa`](agentes/externa/agent.py) | A ferramenta sai da máquina e chama uma API de verdade. | 1 |
-| 4 | [`agentes/debate`](agentes/debate/agent.py) | Três agentes debatem 2 rodadas; um quarto julga. | **7** |
-| 4b | [`agentes/ata`](agentes/ata/agent.py) | O mesmo debate, com as rodadas guardadas em ata em vez de sobrescritas. | **7** |
-| 4c | [`agentes/paralelo`](agentes/paralelo/agent.py) | Três pareceristas opinam ao mesmo tempo sobre um pedido de LAI real; eles não se escutam. | **5** |
-| 4d | [`agentes/frase`](agentes/frase/agent.py) | O mesmo paralelo no osso: cole uma frase, três versões ao mesmo tempo. Nada para instalar. | **4** |
-| 5 | [`adk-basico/`](adk-basico/README.md) | A ferramenta é um modelo de AM servido por HTTP, na própria pasta. | 1 |
+| Pasta | A ideia | Chamadas ao modelo |
+| --- | --- | --- |
+| [`agentes/conversa`](agentes/conversa/agent.py) | Um agente é um modelo com uma instrução. Nada mais. | 1 |
+| [`agentes/ferramenta`](agentes/ferramenta/agent.py) | Ferramenta é uma função Python — nove delas. A docstring vira a especificação. | 1 |
+| [`agentes/externa`](agentes/externa/agent.py) | A ferramenta sai da máquina e chama uma API de verdade. | 1 |
+| [`agentes/debate`](agentes/debate/agent.py) | Três agentes debatem 2 rodadas; um quarto julga. | **7** |
+| [`agentes/ata`](agentes/ata/agent.py) | Um debate de duas rodadas, com as falas guardadas em ata em vez de sobrescritas. | **7** |
+| [`agentes/paralelo`](agentes/paralelo/agent.py) | Três pareceristas opinam ao mesmo tempo sobre um pedido de acesso à informação real; eles não se escutam. | **5** |
+| [`agentes/frase`](agentes/frase/agent.py) | `ParallelAgent` no osso: cole uma frase, três versões ao mesmo tempo. Nada para instalar. | **4** |
+| [`adk-basico/`](adk-basico/README.md) | A ferramenta é um modelo de AM servido por HTTP, na própria pasta. | 1 |
 
-A variante 5 mora em pasta separada, com ambiente próprio, porque precisa de
-dois terminais e de bibliotecas que as outras cinco não usam. Ela é
+O `adk-basico/` mora em pasta separada, com ambiente próprio, porque precisa de
+dois terminais e de bibliotecas que as outras não usam. Ela é
 autossuficiente: o modelo e o serviço que o expõe estão dentro dela.
 
 ---
@@ -38,7 +36,7 @@ licença Apache 2.0, para escrever agentes. Ele cuida da parte chata e repetida:
   devolve o resultado, o modelo continua;
 - guardar **sessão e estado** entre as mensagens;
 - **orquestrar vários agentes** (em sequência, em paralelo, em laço), que é o
-  que a variante `debate` usa;
+  que o `debate` usa;
 - dar uma **interface web de teste** (`adk web`) e um modo terminal
   (`adk run`), que é como a gente roda tudo aqui.
 
@@ -68,8 +66,8 @@ precisa de um dado que não está nele, ou precisa **fazer** alguma coisa no
 mundo. Alguns usos comuns:
 
 - **Atendimento e triagem** — ler um pedido, consultar o sistema interno e
-  decidir para onde mandar. É literalmente a variante 5 aqui: triagem de
-  pedidos da LAI, com um modelo de AM como ferramenta.
+  decidir para onde mandar. É literalmente o que o `adk-basico/` faz aqui:
+  triagem de pedidos de acesso à informação, com um modelo de AM como ferramenta.
 - **Pesquisa e resumo** — buscar em várias fontes (busca, banco de dados,
   seus PDFs) e juntar num texto só.
 - **Operações** — abrir chamado, agendar, mandar e-mail, consultar API —
@@ -144,8 +142,8 @@ faz HTTP para o Google. A **chave de API** identifica a sua conta e a cota.
 3. **Key Type** = Authorization / auth key (não Standard).
 4. Cole no `.env` e rode `just chave`.
 
-Cota gratuita responde `429`/`503` quando aperta — ver "Por que a variante 4
-é cara" e [`agentes/modelo.py`](agentes/modelo.py).
+Cota gratuita responde `429`/`503` quando aperta — ver "Por que o `debate` é
+caro" e [`agentes/modelo.py`](agentes/modelo.py).
 
 ---
 
@@ -173,7 +171,7 @@ just sync                 # .venv do ADK
 just sync-qwen            # .venv do servico-qwen (torch CPU + BentoML)
 ```
 
-A variante 5 (`adk-basico/`) tem ambiente próprio — veja o README dela.
+O `adk-basico/` tem ambiente próprio — veja o README dela.
 
 ## Rodar (Qwen local — padrão)
 
@@ -184,7 +182,7 @@ just qwen-serve           # terminal 1 — modelo (porta 3000)
 just web                  # terminal 2 — http://localhost:8000
 ```
 
-Comece pela variante **conversa**. No terminal: `just cli conversa`.
+Comece pela pasta **conversa**. No terminal: `just cli conversa`.
 
 Se a porta 3000 estiver ocupada:
 
@@ -210,7 +208,7 @@ Antes de gastar cota na nuvem:
 just verificar
 just testar-api
 ```
-## Por que a variante 2 existe
+## Por que a `ferramenta` existe
 
 Isto foi medido em **09/09/2026**, com a mesma pergunta, no mesmo dia, com o
 mesmo modelo. A única diferença é que a segunda tem uma ferramenta.
@@ -231,10 +229,10 @@ de QA responde *"terça-feira"* para uma pergunta de *"quando"*, com score
 **maior** que o das respostas certas. Modelo confiante e modelo correto são
 coisas diferentes, e nenhum painel de servidor distingue as duas.
 
-## Por que a variante 4 é cara
+## Por que o `debate` é caro
 
 Sete chamadas por pergunta: 3 debatedores × 2 rodadas + 1 mediador. Isso é
-**sete vezes** o custo e a latência da variante 1, e nada na tela avisa.
+**sete vezes** o custo e a latência da `conversa`, e nada na tela avisa.
 
 E não é só custo. Medido no mesmo dia, seis chamadas seguidas a
 `gemini-3.1-flash-lite` na cota gratuita deram **3 sucessos e 3 erros 503**. Com
@@ -248,7 +246,7 @@ confiabilidade de cada passo entra elevada a N.** Encadear agentes multiplica a
 fragilidade tão rápido quanto multiplica o custo. Repetição compra resiliência
 contra falha transitória — não contra indisponibilidade.
 
-## O que a variante 4b conserta
+## O que a `ata` conserta
 
 A `debate` funciona, e é justamente por funcionar que ela ensina: os três
 defeitos dela são de **estado**, e nenhum deles aparece na resposta.

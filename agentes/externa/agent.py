@@ -1,13 +1,13 @@
-"""Variante 3 — a ferramenta sai da máquina e chama uma API de verdade.
+"""externa — a ferramenta sai da máquina e chama uma API de verdade.
 
-Na variante `ferramenta` as duas funções só usavam Python. Aqui elas fazem uma
+As duas funções abaixo não se resolvem em Python: cada uma faz uma
 chamada HTTP para a BrasilAPI (<https://brasilapi.com.br>): aberta, sem chave,
 sem cadastro.
 
-O CÓDIGO DO AGENTE NÃO MUDA
----------------------------
-Compare com `../ferramenta/agent.py`: é a mesma estrutura, as mesmas docstrings,
-o mesmo `tools=[...]`. Do ponto de vista do agente, uma função que soma dois
+O CÓDIGO DO AGENTE NÃO MUDA POR CAUSA DA REDE
+---------------------------------------------
+Estrutura, docstring e `tools=[...]` são os mesmos de uma ferramenta que só
+usa Python. Do ponto de vista do agente, uma função que soma dois
 números e uma função que atravessa a internet são a mesma coisa. Isso é bom
 (simplicidade) e é perigoso (o modelo não sabe que aquilo custa rede).
 

@@ -1,5 +1,5 @@
 # =============================================================================
-# Variante 4d — frase
+# frase
 #
 # ParallelAgent no osso: cole uma frase, três agentes a reescrevem ao mesmo
 # tempo, um relator compara (4 chamadas ao modelo por frase).

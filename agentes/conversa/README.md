@@ -1,4 +1,4 @@
-# Variante 1 — `conversa`
+# `conversa`
 
 O menor agente possível: um modelo, um nome, uma descrição e uma instrução.
 Sem ferramenta, sem laço, sem segundo agente.
@@ -13,8 +13,8 @@ já não é mais o menor exemplo.
 
 1. Ele obedece à instrução (duas frases, sempre uma pergunta no fim).
 2. Ele **inventa** com tranquilidade. Pergunte o preço do dólar hoje: ele não
-   tem como saber e mesmo assim responde. É esse buraco que a variante
-   [`ferramenta`](../ferramenta/) começa a tapar.
+   tem como saber e mesmo assim responde. Um agente sem ferramenta não tem
+   de onde tirar o que não está no modelo.
 
 ## Rodar
 

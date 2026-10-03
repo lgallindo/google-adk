@@ -1,5 +1,5 @@
 # =============================================================================
-# Variante 3 — externa
+# externa
 #
 # Ferramentas que chamam a BrasilAPI (HTTP de verdade).
 # Ambiente Python: a .venv da raiz do repositório (compartilhada).

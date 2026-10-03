@@ -1,7 +1,7 @@
 # =============================================================================
-# Variante 4b — ata
+# ata
 #
-# O mesmo debate da variante 4, com as rodadas acumuladas em state["ata"].
+# Um debate de duas rodadas, com as falas acumuladas em state["ata"].
 # Ambiente Python: a .venv da raiz do repositório (compartilhada).
 #
 #     just sync          instala/atualiza a .venv da raiz

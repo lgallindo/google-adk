@@ -1,12 +1,12 @@
-"""Variante 5 — o mesmo "em ordem" do `debate`, escrito como `Workflow`.
+"""fluxo — dois nós em ordem, escritos como `Workflow`.
 
 POR QUE ESTA PASTA EXISTE
 -------------------------
 `SequentialAgent`, `LoopAgent` e `ParallelAgent` estão **deprecados** no ADK
 2.8: importar qualquer um dos três já imprime um aviso dizendo que serão
-removidos "in favor of Workflow". As variantes `debate`, `ata` e `paralelo`
-continuam funcionando, e continuam sendo a forma mais fácil de explicar
-orquestração — mas o substituto oficial é este.
+removidos "in favor of Workflow". Os três continuam funcionando, e continuam
+sendo a forma mais fácil de explicar orquestração — mas o substituto oficial
+é este.
 
 A MUDANÇA DE CABEÇA: DE ÁRVORE PARA GRAFO
 -----------------------------------------
@@ -42,7 +42,7 @@ diferentes, e isso tem duas consequências práticas:
 
 COMO OS DOIS NÓS CONVERSAM
 --------------------------
-Do mesmo jeito do `debate`, e de propósito: `output_key` grava a resposta numa
+Pelo estado da sessão, e de propósito: `output_key` grava a resposta numa
 chave do estado, e a instrução do nó seguinte interpola `{essa_chave}`. O grafo
 manda na ORDEM; quem carrega o CONTEÚDO continua sendo o estado da sessão.
 

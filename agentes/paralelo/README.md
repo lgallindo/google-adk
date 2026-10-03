@@ -1,4 +1,4 @@
-# Variante 4c — `paralelo`
+# `paralelo`
 
 Três pareceristas analisam **o mesmo pedido de acesso à informação, ao mesmo
 tempo**, e um relator costura. O pedido é real: vem de uma amostra de 60
@@ -8,7 +8,7 @@ pedidos de 2025 da base do FalaBR da CGU (veja [`dados/`](dados/)).
 SequentialAgent "paralelo"
 ├── porteiro                       busca o pedido  -> state["pedido"]
 ├── ParallelAgent "pareceres"      ← os três disparam juntos
-│   ├── juridico   a decisão se sustenta na LAI?   -> parecer_juridico
+│   ├── juridico   a decisão se sustenta na lei?   -> parecer_juridico
 │   ├── merito     a resposta responde?            -> parecer_merito
 │   └── risco      a pessoa vai recorrer?          -> parecer_risco
 └── relator                        lê os três e fecha
@@ -18,8 +18,8 @@ Cinco chamadas ao modelo por pedido.
 
 ## A ideia
 
-**Eles não se escutam.** No [`debate`](../debate/), o cético interpola
-`{arg_otimista}` e lê a fala da colega. Aqui isso não tem como funcionar: os
+**Eles não se escutam.** Numa fila, um agente interpola na instrução a chave
+que o anterior gravou e lê a fala da colega. Aqui isso não tem como ser: os
 três começam no mesmo instante, então quando o jurídico monta o prompt dele o
 parecer de mérito ainda não existe.
 
@@ -93,7 +93,7 @@ DeprecationWarning: ParallelAgent is deprecated in favor of Workflow
 
 Vale para `SequentialAgent` e `LoopAgent` também. Na 2.x os três viraram
 legado em favor do [`Workflow`](https://adk.dev/graphs/), que é um grafo de
-`edges` — é o que a variante [`fluxo`](../fluxo/) usa. Nada quebra, e a maior
+`edges`. Nada quebra, e a maior
 parte do material que existe hoje ainda usa estas classes, mas é o jeito
 clássico, não o novo.
 

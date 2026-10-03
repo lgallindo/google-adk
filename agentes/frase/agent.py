@@ -1,8 +1,8 @@
-"""Variante 4d — uma frase, três versões ao mesmo tempo.
+"""frase — uma frase, três versões ao mesmo tempo.
 
-É a [`paralelo`](../paralelo/) sem nada em volta: sem ferramenta, sem arquivo
-de dados, sem gabarito, sem busca. Você cola UMA frase e três agentes a
-reescrevem ao mesmo tempo, cada um para um leitor diferente.
+`ParallelAgent` no osso: sem ferramenta, sem arquivo de dados, sem gabarito,
+sem busca. Você cola UMA frase e três agentes a reescrevem ao mesmo tempo,
+cada um para um leitor diferente.
 
     SequentialAgent "frase"
     ├── ParallelAgent "versoes"      ← as três ao mesmo tempo
@@ -16,7 +16,7 @@ Quatro chamadas ao modelo por frase.
 POR QUE ESTA VARIANTE EXISTE
 ----------------------------
 Para mostrar `ParallelAgent` sem que a turma precise entender mais nada. Não
-há pedido de LAI para ler, nem protocolo para decorar, nem tabela para
+há pedido para ler, nem protocolo para decorar, nem tabela para
 consultar: o que entra é a frase que você colar, e o que sai são três versões
 dela. Dá para fazer com qualquer frase que apareça na tela — do edital, do
 e-mail que você acabou de receber, do slide anterior.
@@ -38,8 +38,8 @@ primeiro e iria atrás.
 ⚠ DEPRECIADO NA 2.8.0
 ---------------------
 `ParallelAgent`, `SequentialAgent` e `LoopAgent` imprimem um aviso de
-depreciação na 2.x, em favor do `Workflow` — veja [`fluxo`](../fluxo/). Nada
-quebra; é o jeito clássico, não o novo.
+depreciação na 2.x, em favor do `Workflow`. Nada quebra; é o jeito clássico,
+não o novo.
 """
 
 from google.adk.agents import Agent, ParallelAgent, SequentialAgent
@@ -105,7 +105,7 @@ zoomer = Agent(
     instruction=(
         "Você é geração Z. Você não se importa com seus professores millenials."
         "Você gosta de dançar no TikTok e farmar aura."
-         "As respostas não precisam ser compreensíveis." + REGRA_COMUM
+        "As respostas não precisam ser compreensíveis." + REGRA_COMUM
     ),
     output_key="versao_zoomer",
 )

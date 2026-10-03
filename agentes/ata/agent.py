@@ -1,12 +1,20 @@
-"""Variante 4b — o mesmo debate da variante 4, com o estado consertado.
+"""ata — um debate de duas rodadas, com cada fala guardada em ata.
 
-A variante `debate` funciona e tem três defeitos de **estado**, todos anotados
-no cabeçalho dela. Esta pasta é a resposta a eles. Nada aqui muda o formato do
-debate: continuam três debatedores, **duas** rodadas, um mediador e sete chamadas
-ao modelo. O que muda é **o que sobra no estado da sessão quando acaba**.
+Três debatedores, **duas** rodadas, um mediador, sete chamadas ao modelo.
 
-OS TRÊS DEFEITOS, E O QUE CADA UM VIROU AQUI
---------------------------------------------
+    SequentialAgent "ata"
+    ├── LoopAgent "rodadas"  (max_iterations=2)
+    │   ├── LlmAgent "otimista"      -> state["arg_otimista"]   + ata
+    │   ├── LlmAgent "cetico"        -> state["arg_cetico"]     + ata
+    │   └── LlmAgent "pragmatico"    -> state["arg_pragmatico"] + ata
+    └── LlmAgent "mediador"          lê a ata inteira e decide
+
+O assunto desta pasta não é o debate: é **o que sobra no estado da sessão
+quando ele acaba**. Um laço que só usa `output_key` deixa três armadilhas no
+caminho, e cada peça estranha do arquivo existe para desarmar uma delas.
+
+AS TRÊS ARMADILHAS, E O QUE CADA UMA VIROU AQUI
+-----------------------------------------------
 1. `output_key` **sobrescreve**. Na rodada 2 o otimista regrava
    `arg_otimista` e a fala da rodada 1 desaparece do estado. `output_key` sabe
    atribuir, não sabe acrescentar.
@@ -14,22 +22,22 @@ OS TRÊS DEFEITOS, E O QUE CADA UM VIROU AQUI
      fala recém-escrita para o fim de uma LISTA em `state["ata"]`. A lista
      cresce: seis falas ao final, com rodada e autor em cada uma.
 
-2. O mediador da variante 4 lê só a ÚLTIMA rodada pelas chaves; a
-   primeira chega a ele apenas pelo histórico da conversa — que é uma coisa
-   que ele vê, mas que você não controla nem consegue inspecionar.
+2. Ler só as chaves daria ao mediador a ÚLTIMA rodada e mais nada; as
+   anteriores chegariam a ele apenas pelo histórico da conversa — que é uma
+   coisa que ele vê, mas que você não controla nem consegue inspecionar.
    → Aqui o mediador lê a ata inteira, montada em Python, na ordem, com rótulo
      de rodada. O que ele recebe você consegue ler na aba **State** do
      `adk web`.
 
-3. Leitura **assimétrica**: quem fala primeiro na rodada não lê nada pelas
-   chaves (o otimista da variante 4 não tem nenhum `{...}` na instrução), o
-   segundo lê uma e o terceiro lê duas. Os três estavam olhando para estados
-   diferentes, e isso não estava escrito em lugar nenhum.
+3. Leitura **assimétrica**: quem fala primeiro na rodada não tem chave de
+   colega nenhuma para interpolar, o segundo lê uma e o terceiro lê duas. Os
+   três estariam olhando para estados diferentes, sem que isso esteja escrito
+   em lugar nenhum.
    → Todos os três recebem a MESMA transcrição, montada pela mesma função. O
-     otimista da rodada 2 agora lê a rodada 1 pelo estado, e não por sorte.
+     otimista da rodada 2 lê a rodada 1 pelo estado, e não por sorte.
 
-A FERRAMENTA NOVA: INSTRUÇÃO QUE É FUNÇÃO
------------------------------------------
+INSTRUÇÃO QUE É FUNÇÃO, NÃO STRING
+----------------------------------
 `instruction=` aceita uma string (com `{chave}` interpolado pelo ADK) **ou uma
 função** que recebe o contexto e devolve a string. Uma lista não cabe na forma
 string — `{ata}` renderizaria o `repr` do Python na cara do modelo. Então aqui
@@ -52,8 +60,8 @@ mesma informação viaja duas vezes. Dá para cortar a duplicação com
 que a pergunta da pessoa também sai do prompt e você precisa injetá-la à mão a
 partir de `ctx.user_content`. Fica como exercício.
 
-O QUE ESTA VARIANTE NÃO CONSERTA
---------------------------------
+O QUE ESTA PASTA NÃO CONSERTA
+-----------------------------
 O estado ainda morre com o processo, porque quem escolhe onde guardar sessão
 não é este arquivo — é quem sobe o servidor. `just web` usa memória.
 `just web-memoria` sobe o mesmo servidor com um SQLite ao lado, e aí a ata
@@ -134,7 +142,7 @@ def registrar(callback_context: CallbackContext) -> None:
 
     Roda depois do agente, quando `state["arg_<nome>"]` já tem a fala desta
     rodada — e antes de a próxima rodada sobrescrever aquela chave. É essa
-    janela que a variante 4 não usa.
+    janela que um `output_key` sozinho deixa passar.
 
     Repare no `list(...)`: a ata é **recriada e reatribuída**, nunca alterada
     no lugar. `state[chave] = valor` é o que registra a mudança para ser
@@ -273,6 +281,6 @@ mediador = Agent(
 
 root_agent = SequentialAgent(
     name="ata",
-    description="O debate da variante 4, com as duas rodadas guardadas em ata.",
+    description="Um debate de duas rodadas, com todas as falas guardadas em ata.",
     sub_agents=[rodadas, mediador],
 )

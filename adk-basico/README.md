@@ -55,7 +55,7 @@ Três blocos, e nada além disso:
 
 ```python
 def risco_de_recurso(orgao: str, decisao: str) -> dict:
-    """Estima o risco de um pedido da LAI virar recurso.
+    """Estima o risco de um pedido de acesso à informação virar recurso.
 
     Args:
         orgao: nome do órgão destinatário, por exemplo "Ministério da Saúde".
@@ -84,7 +84,7 @@ def risco_de_recurso(orgao: str, decisao: str) -> dict:
 root_agent = Agent(
     name="triagem",
     model=modelo(),
-    description="Ajuda a ouvidoria a escolher quais pedidos da LAI revisar.",
+    description="Ajuda a ouvidoria a escolher quais pedidos revisar.",
     instruction="...",
     tools=[risco_de_recurso, orcamento_de_revisao],
 )

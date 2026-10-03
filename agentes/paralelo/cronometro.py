@@ -2,7 +2,7 @@
 
 Não acredite que `ParallelAgent` é mais rápido: meça. Este script monta o
 mesmo trio de `agent.py` duas vezes — uma dentro de um `SequentialAgent`,
-outra dentro de um `ParallelAgent` — dá a eles o MESMO pedido de LAI e
+outra dentro de um `ParallelAgent` — dá a eles o MESMO pedido e
 cronometra. Três chamadas ao modelo de cada lado, seis no total.
 
     just cronometro                       # Gemini na nuvem (padrão)

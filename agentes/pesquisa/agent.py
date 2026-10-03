@@ -1,8 +1,7 @@
-"""Variante 5b — o `fluxo`, mas com um grafo que não é uma linha reta.
+"""pesquisa — um pipeline de pesquisa como grafo, com abre-e-fecha duas vezes.
 
-O `fluxo` tem dois nós em fila e serve para mostrar a SINTAXE do `Workflow`.
-Esta pasta usa a mesma sintaxe para o que ela existe de verdade: um pipeline de
-pesquisa com abre-e-fecha, duas vezes.
+Um `Workflow` que não é uma linha reta: sete papéis, onze nós e dois pontos em
+que o grafo abre em três ramos paralelos e volta a fechar.
 
     START
       │
@@ -33,11 +32,10 @@ pesquisa com abre-e-fecha, duas vezes.
 --------------------------------------
 Some 1+3+1+1+3+1+1. Não é uma variante para repetir dez vezes na frente da
 turma com a cota gratuita: rode uma vez, com um tema pequeno, e leia o estado
-na aba **State** do `adk web`. As variantes de 1 a 4 continuam sendo as de
-demonstrar ao vivo.
+na aba **State** do `adk web`.
 
-A IDEIA NOVA #1: FAN-IN PRECISA DE `JoinNode`
----------------------------------------------
+FAN-OUT É UMA TUPLA; FAN-IN PRECISA DE `JoinNode`
+-------------------------------------------------
 Abrir em três é fácil: uma TUPLA dentro da corrente vira fan-out, e o ADK
 dispara os três ao mesmo tempo.
 
@@ -59,18 +57,17 @@ predecessores chegaram. É por isso que existem dois nós aqui, `fontes_prontas`
     termina num JoinNode. Se você fechar um leque num nó comum,
     o bug não aparece como erro — aparece como texto incompleto.
 
-A IDEIA NOVA #2: O GRAFO MANDA NA ORDEM, O ESTADO CARREGA O CONTEÚDO
---------------------------------------------------------------------
-Isso não mudou desde o `debate`, e é o que faz o pipeline inteiro funcionar:
-cada nó grava a resposta numa chave com `output_key`, e o nó seguinte interpola
+O GRAFO MANDA NA ORDEM, O ESTADO CARREGA O CONTEÚDO
+---------------------------------------------------
+É o que faz o pipeline inteiro funcionar: cada nó grava a resposta numa chave com `output_key`, e o nó seguinte interpola
 `{aquela_chave}` na instrução. As arestas dizem QUANDO cada um roda; o estado da
 sessão diz O QUE ele lê.
 
 Repare no paralelismo: `fontes_1..3` rodam em ramos separados da conversa, mas o
 ESTADO é um só e é compartilhado. Por isso o `redator` consegue ler
 `{fontes_1}`, `{fontes_2}` e `{fontes_3}` juntos, mesmo que quem escreveu nunca
-tenha se visto — e por isso os três pesquisadores, como no `paralelo`, não podem
-ler o trabalho um do outro: quando eles começam, as chaves dos colegas não
+tenha se visto — e por isso os três pesquisadores não podem ler o trabalho um
+do outro: quando eles começam, as chaves dos colegas não
 existem ainda.
 
 ⚠ POR QUE O CRIVO NÃO É UMA ARESTA CONDICIONAL

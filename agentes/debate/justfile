@@ -1,5 +1,5 @@
 # =============================================================================
-# Variante 4 — debate
+# debate
 #
 # SequentialAgent + LoopAgent: três debatedores × 3 rodadas + mediador (12
 # chamadas ao modelo por pergunta).

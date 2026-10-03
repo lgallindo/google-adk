@@ -1,6 +1,6 @@
-# Variante 2 — `ferramenta`
+# `ferramenta`
 
-A diferença para [`conversa`](../conversa/) são funções Python e a linha
+O que dá ferramentas a um agente são funções Python e a linha
 `tools=[...]`. Não há registro de ferramentas, nem schema JSON escrito à mão.
 
 ## A ideia
@@ -14,7 +14,7 @@ apague a linha `data:` do bloco `Args` e veja o agente errar o formato da data.
 
 ## O que isto conserta
 
-Em `conversa` o agente inventava contas e não sabia que dia era hoje. Aqui quem
+Um modelo sozinho inventa contas e não sabe que dia é hoje. Aqui quem
 conta é Python e quem olha o relógio é o SO. O modelo só decide **quando**
 chamar e **com quais** argumentos.
 

@@ -1,5 +1,5 @@
 # =============================================================================
-# Variante 4c — paralelo
+# paralelo
 #
 # ParallelAgent + SequentialAgent: três pareceristas ao mesmo tempo, um
 # relator depois (4 chamadas ao modelo por pergunta).

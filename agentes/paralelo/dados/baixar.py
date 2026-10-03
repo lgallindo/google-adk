@@ -1,9 +1,9 @@
-"""Baixa os dados da LAI da CGU e escreve a amostra desta pasta.
+"""Baixa os dados da CGU e escreve a amostra desta pasta.
 
 FONTE
 -----
 Portal de Dados Abertos da CGU, base do FalaBR (o sistema por onde entram os
-pedidos de Lei de Acesso à Informação do Executivo federal):
+pedidos de acesso à informação do Executivo federal):
 
     https://dadosabertos-download.cgu.gov.br/FalaBR/Arquivos_FalaBR_Filtrado/
 
@@ -198,7 +198,7 @@ def main() -> None:
     p.add_argument("--semente", type=int, default=2173)
     args = p.parse_args()
 
-    print(f"\nLAI {args.ano} — CGU/FalaBR\n")
+    print(f"\nPedidos {args.ano} — CGU/FalaBR\n")
     caminho = baixar_zip(args.ano)
     amostra = montar(caminho, args.n, args.semente)
 

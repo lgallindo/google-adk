@@ -1,4 +1,4 @@
-# Variante 4d — `frase`
+# `frase`
 
 `ParallelAgent` no osso. Você cola **uma frase**, três agentes a reescrevem ao
 mesmo tempo para três leitores diferentes, e um relator compara.
@@ -16,14 +16,11 @@ Quatro chamadas ao modelo por frase.
 
 ## Para que serve
 
-É a [`paralelo`](../paralelo/) sem nada em volta: **sem ferramenta, sem
-arquivo de dados, sem gabarito, sem protocolo para decorar**. O que entra é a
+`ParallelAgent` sem nada em volta: **sem ferramenta, sem arquivo de dados,
+sem gabarito, sem protocolo para decorar**. O que entra é a
 frase que você colar; o que sai são três versões dela. Serve para mostrar
 `ParallelAgent` com a turma olhando, sem que ninguém precise entender o
 domínio antes.
-
-Se quiser a mesma ideia num problema de verdade, com dados reais e um
-gabarito para conferir, é a [`paralelo`](../paralelo/) que você quer.
 
 ## Rodar
 
@@ -72,8 +69,8 @@ DeprecationWarning: ParallelAgent is deprecated in favor of Workflow
 ```
 
 Vale para `SequentialAgent` e `LoopAgent` também. Na 2.x os três viraram
-legado em favor do [`Workflow`](https://adk.dev/graphs/) — é o que a variante
-[`fluxo`](../fluxo/) usa. Nada quebra; é o jeito clássico, não o novo.
+legado em favor do [`Workflow`](https://adk.dev/graphs/). Nada quebra; é o
+jeito clássico, não o novo.
 
 Detalhe no cabeçalho de [`agent.py`](agent.py). Contexto do curso no
 [`README`](../../README.md) da raiz.

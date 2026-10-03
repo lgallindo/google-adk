@@ -9,7 +9,7 @@ SERVICO = "http://localhost:3000/risco"
 
 
 def risco_de_recurso(orgao: str, decisao: str) -> dict:
-    """Estima o risco de um pedido da LAI virar recurso.
+    """Estima o risco de um pedido de acesso à informação virar recurso.
 
     Args:
         orgao: nome do órgão destinatário, por exemplo "Ministério da Saúde".
@@ -35,7 +35,7 @@ def orcamento_de_revisao(pedidos_na_fila: int, percentual: float) -> dict:
 root_agent = Agent(
     name="triagem",
     model=modelo(),
-    description="Ajuda a ouvidoria a escolher quais pedidos da LAI revisar.",
+    description="Ajuda a ouvidoria a escolher quais pedidos revisar.",
     instruction=(
         "Você ajuda a ouvidoria a decidir quais pedidos revisar antes de responder. "
         "Use risco_de_recurso para consultar o modelo e orcamento_de_revisao para "
