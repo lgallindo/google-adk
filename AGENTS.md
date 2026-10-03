@@ -18,3 +18,7 @@ Applies to `README.md`, `*/agent.py` module docstrings, auxiliary modules
 (`modelo.py`, `verificar.py`, `servico-local/`, `08_paralelo/pedidos.py`,
 `cronometro.py`, `dados/baixar.py`, …). LLM `instruction=` strings may keep
 behavioral forbids (“diga que não sabe”).
+
+**Student-facing files are shared prose** (`no-sausage-in-shared.mdc`): no
+rule-ID sermons, no “how we wrote this”, no agent/session traces. Put that in
+`AGENTS.md` / Lucas ops only.
